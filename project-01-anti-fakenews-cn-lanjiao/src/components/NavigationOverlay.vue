@@ -19,15 +19,24 @@
 
         <!-- Desktop Navigation Menu -->
         <div class="hidden md:flex items-center space-x-8">
-          <router-link
-            v-for="item in navigationItems"
-            :key="item.path"
-            :to="item.path"
-            class="text-white hover:text-blue-200 transition-colors duration-200 font-medium"
-            :class="{ 'text-blue-200': $route.path === item.path }"
-          >
-            {{ item.label }}
-          </router-link>
+          <template v-for="item in navigationItems" :key="item.path">
+            <button
+              v-if="item.isCustomAction"
+              @click="handleNavigationClick(item)"
+              class="text-white hover:text-blue-200 transition-colors duration-200 font-medium"
+              :class="{ 'text-blue-200': $route.path === item.path }"
+            >
+              {{ item.label }}
+            </button>
+            <router-link
+              v-else
+              :to="item.path"
+              class="text-white hover:text-blue-200 transition-colors duration-200 font-medium"
+              :class="{ 'text-blue-200': $route.path === item.path }"
+            >
+              {{ item.label }}
+            </router-link>
+          </template>
         </div>
 
         <!-- Action Buttons -->
@@ -80,16 +89,25 @@
           class="md:hidden mt-4 bg-black/50 backdrop-blur-md rounded-lg p-4"
         >
           <div class="flex flex-col space-y-3">
-            <router-link
-              v-for="item in navigationItems"
-              :key="item.path"
-              :to="item.path"
-              @click="closeMobileMenu"
-              class="text-white hover:text-blue-200 transition-colors duration-200 font-medium py-2"
-              :class="{ 'text-blue-200': $route.path === item.path }"
-            >
-              {{ item.label }}
-            </router-link>
+            <template v-for="item in navigationItems" :key="item.path">
+              <button
+                v-if="item.isCustomAction"
+                @click="handleNavigationClick(item); closeMobileMenu()"
+                class="text-white hover:text-blue-200 transition-colors duration-200 font-medium py-2 text-left"
+                :class="{ 'text-blue-200': $route.path === item.path }"
+              >
+                {{ item.label }}
+              </button>
+              <router-link
+                v-else
+                :to="item.path"
+                @click="closeMobileMenu"
+                class="text-white hover:text-blue-200 transition-colors duration-200 font-medium py-2"
+                :class="{ 'text-blue-200': $route.path === item.path }"
+              >
+                {{ item.label }}
+              </router-link>
+            </template>
             <hr class="border-white/20">
             <button
               @click="$router.push('/submit'); closeMobileMenu()"
@@ -129,7 +147,7 @@ const isDark = ref(false)
 
 const navigationItems: NavigationItem[] = [
   { label: 'Home', path: '/' },
-  { label: 'Latest News', path: '/news' },
+  { label: 'Latest News', path: '/news', isCustomAction: true },
   { label: 'Fact Check', path: '/fact-check' },
   { label: 'About', path: '/about' }
 ]
@@ -147,6 +165,26 @@ const toggleTheme = () => {
   // Here you would typically update a global theme store
   // For now, we'll just toggle the local state
   document.documentElement.classList.toggle('dark', isDark.value)
+}
+
+const handleNavigationClick = async (item: NavigationItem) => {
+  if (item.isCustomAction && item.label === 'Latest News') {
+    // 跳转到主页并滚动到新闻分类部分
+    await router.push('/')
+    // 等待路由跳转完成后再滚动
+    setTimeout(() => {
+      const element = document.getElementById('latest-news-section')
+      if (element) {
+        element.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        })
+      }
+    }, 100)
+  } else {
+    // 普通路由跳转
+    router.push(item.path)
+  }
 }
 
 // Close mobile menu when route changes

@@ -17,6 +17,7 @@
       "pending": 8
     },
     "confidence": 92,
+    "isFake": false,
     "tags": ["climate", "technology", "research", "environment"],
     "reporter": "MIT News Office",
     "views": 2847,
@@ -40,6 +41,7 @@
       "pending": 15
     },
     "confidence": 89,
+    "isFake": false,
     "tags": ["economics", "inflation", "policy", "global"],
     "reporter": "World Bank Press",
     "views": 3521,
@@ -63,6 +65,7 @@
       "pending": 45
     },
     "confidence": 67,
+    "isFake": false,
     "tags": ["archaeology", "egypt", "history", "discovery"],
     "reporter": "Archaeological Institute",
     "views": 1892,
@@ -86,6 +89,7 @@
       "pending": 89
     },
     "confidence": 34,
+    "isFake": true,
     "tags": ["quantum", "computing", "technology", "breakthrough"],
     "reporter": "TechCorp Press Release",
     "views": 4567,
@@ -109,6 +113,7 @@
       "pending": 12
     },
     "confidence": 95,
+    "isFake": false,
     "tags": ["medicine", "gene-therapy", "research", "children"],
     "reporter": "Johns Hopkins Medicine",
     "views": 2156,

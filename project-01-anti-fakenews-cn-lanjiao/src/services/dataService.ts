@@ -84,18 +84,23 @@ export class DataService {
   }
 
   private async loadNewsDataFromAPI(): Promise<News[]> {
-    const data = await this.fetchFromAPI('/news')
+    const data = await this.fetchFromAPI('/mockNews.json')
     return data.news || data // Handle both {news: [...]} and [...] formats
   }
 
   private async loadCommentsDataFromAPI(): Promise<Comment[]> {
-    const data = await this.fetchFromAPI('/comments')
+    const data = await this.fetchFromAPI('/mockComments.json')
     return data.comments || data // Handle both {comments: [...]} and [...] formats
   }
 
   private async loadVotesDataFromAPI(): Promise<Vote[]> {
-    const data = await this.fetchFromAPI('/votes')
+    const data = await this.fetchFromAPI('/mockVotes.json')
     return data.votes || data // Handle both {votes: [...]} and [...] formats
+  }
+
+  private async loadUsersDataFromAPI(): Promise<any[]> {
+    const data = await this.fetchFromAPI('/mockUsers.json')
+    return data.users || data // Handle both {users: [...]} and [...] formats
   }
 
   // Unified data loading methods with fallback
@@ -135,6 +140,21 @@ export class DataService {
       }
     } else {
       return await this.loadVotesDataFromJSON()
+    }
+  }
+
+  async loadUsersData(): Promise<any[]> {
+    if (this.useExternalAPI) {
+      try {
+        return await this.loadUsersDataFromAPI()
+      } catch (error) {
+        console.warn('Failed to load users from external API, falling back to local JSON:', error)
+        // For now, return empty array as fallback since we don't have local users data
+        return []
+      }
+    } else {
+      // Return empty array for local mode since we don't have local users data
+      return []
     }
   }
 

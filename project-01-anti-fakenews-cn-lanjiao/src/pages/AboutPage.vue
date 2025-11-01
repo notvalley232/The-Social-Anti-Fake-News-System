@@ -151,32 +151,36 @@
           <section class="bg-white rounded-xl shadow-soft p-8 mb-8">
             <h2 class="text-2xl font-semibold text-text-primary mb-6">Our Team</h2>
             <p class="text-text-secondary leading-relaxed mb-6">
-              We are a dedicated team of developers, researchers, and fact-checking enthusiasts 
-              committed to building tools that help combat misinformation and promote media literacy.
+              We are a group from the Software Engineering (Jointly-run with Foreign Universities) Department of the Computer Science and Engineering College of Northern Mingzu University.
+               LiaoRunhong is the team leader and YangWenqiang,Zhangchi  are team members. Our team is the smartest team in the entire class.
             </p>
             <div class="grid md:grid-cols-3 gap-6">
               <div class="text-center">
                 <div class="w-20 h-20 bg-primary-100 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <span class="text-2xl">👨‍💻</span>
                 </div>
-                <h4 class="font-semibold text-text-primary">Development Team</h4>
-                <p class="text-text-secondary text-sm">Building robust and scalable solutions</p>
+                <h4 class="font-semibold text-text-primary">LiaoRunhong(mashison)</h4>
+                <p class="text-text-secondary text-sm">20232041</p>
+                <p class="text-text-secondary text-sm">github:notvalley232</p>
+                <p class="text-text-secondary text-sm">（leader）</p>
               </div>
               
               <div class="text-center">
                 <div class="w-20 h-20 bg-primary-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <span class="text-2xl">🔬</span>
+                  <span class="text-2xl">👨‍💻</span>
                 </div>
-                <h4 class="font-semibold text-text-primary">Research Team</h4>
-                <p class="text-text-secondary text-sm">Studying misinformation patterns and trends</p>
+                <h4 class="font-semibold text-text-primary">YangWenqiang(Mike)</h4>
+                <p class="text-text-secondary text-sm">20232040</p>
+                <p class="text-text-secondary text-sm">github:ywq0303</p>
               </div>
               
               <div class="text-center">
                 <div class="w-20 h-20 bg-primary-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <span class="text-2xl">🛡️</span>
+                  <span class="text-2xl">👨‍💻</span>
                 </div>
-                <h4 class="font-semibold text-text-primary">Moderation Team</h4>
-                <p class="text-text-secondary text-sm">Ensuring quality and preventing abuse</p>
+                <h4 class="font-semibold text-text-primary">Zhangchi(Micky)</h4>
+                <p class="text-text-secondary text-sm">20232042</p>
+                <p class="text-text-secondary text-sm">github:zcyyds1110</p>
               </div>
             </div>
           </section>

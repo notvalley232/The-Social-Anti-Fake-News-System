@@ -21,6 +21,7 @@ export interface News {
   realVotes: number
   fakeVotes: number
   confidence?: number
+  isFake?: boolean
   tags?: string[]
   views?: number
   shares?: number
@@ -104,6 +105,7 @@ export interface NavigationItem {
   label: string
   path: string
   icon?: string
+  isCustomAction?: boolean
 }
 
 // Filter configuration types

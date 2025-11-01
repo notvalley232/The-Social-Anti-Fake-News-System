@@ -50,7 +50,7 @@
      <!-- Main Content Section -->
     <main class="relative z-10 bg-white">
       <!-- News Categories Section -->
-      <section class="py-8 bg-white border-b border-gray-200">
+      <section id="latest-news-section" class="py-8 bg-white border-b border-gray-200">
         <div class="container mx-auto px-4">
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold text-gray-900">Latest News</h2>
@@ -84,9 +84,57 @@
           </div>
 
           <!-- Category Description -->
-          <p class="text-gray-600 mb-8">
+          <p class="text-gray-600 mb-6">
             {{ getCategoryDescription(activeCategory) }}
           </p>
+
+          <!-- Fake/Real Filter Section -->
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-lg font-semibold text-gray-800">News Authenticity</h3>
+              <div class="text-sm text-gray-600">
+                <span v-if="activeAuthenticityFilter === null" class="text-blue-600 font-medium">
+                  📰 Showing all news
+                </span>
+                <span v-else-if="activeAuthenticityFilter === 'real'" class="text-green-600 font-medium">
+                  ✅ Showing verified real news
+                </span>
+                <span v-else-if="activeAuthenticityFilter === 'fake'" class="text-red-600 font-medium">
+                  ❌ Showing verified fake news
+                </span>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button
+                v-for="filter in authenticityFilters"
+                :key="filter.value"
+                @click="setAuthenticityFilter(filter.value)"
+                class="group relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105 border-2"
+                :class="activeAuthenticityFilter === filter.value 
+                  ? 'bg-green-600 text-white shadow-lg ring-2 ring-green-300 border-green-600' 
+                  : 'bg-white text-gray-700 hover:bg-green-50 hover:text-green-700 hover:shadow-md border-gray-200 hover:border-green-300'"
+              >
+                <span class="relative z-10 flex items-center">
+                  <span class="mr-2">{{ filter.icon }}</span>
+                  {{ filter.label }}
+                </span>
+                <span 
+                  v-if="getAuthenticityCount(filter.value) > 0"
+                  class="ml-2 px-2 py-0.5 text-xs rounded-full transition-colors duration-300"
+                  :class="activeAuthenticityFilter === filter.value 
+                    ? 'bg-green-500 text-white' 
+                    : 'bg-gray-200 text-gray-600 group-hover:bg-green-200 group-hover:text-green-800'"
+                >
+                  {{ getAuthenticityCount(filter.value) }}
+                </span>
+                <!-- Active indicator -->
+                <div 
+                  v-if="activeAuthenticityFilter === filter.value"
+                  class="absolute inset-0 bg-green-600 rounded-lg opacity-10 animate-pulse"
+                ></div>
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -262,6 +310,7 @@ const newsStore = useNewsStore()
 // Reactive data
 const newsList = ref<News[]>([])
 const activeCategory = ref('all')
+const activeAuthenticityFilter = ref(null)
 const loading = ref(false)
 const currentPage = ref(1)
 const itemsPerPage = ref(6)
@@ -277,6 +326,12 @@ const newsCategories = [
   { label: 'Finance', value: 'Finance' } // Updated from History
 ]
 
+// Authenticity filters
+const authenticityFilters = [
+  { label: 'Verified Real', value: 'real', icon: '✅' },
+  { label: 'Verified Fake', value: 'fake', icon: '❌' }
+]
+
 // Computed properties
 const featuredNews = computed(() => {
   return newsList.value.find(news => news.status === 'real' && news.realVotes > 50)
@@ -290,6 +345,18 @@ const filteredNews = computed(() => {
     filtered = filtered.filter(news => {
       if (!news.category) return false
       return news.category.toLowerCase() === activeCategory.value.toLowerCase()
+    })
+  }
+  
+  // Filter by authenticity (Fake/Real)
+  if (activeAuthenticityFilter.value !== null) {
+    filtered = filtered.filter(news => {
+      if (activeAuthenticityFilter.value === 'real') {
+        return news.status === 'real'
+      } else if (activeAuthenticityFilter.value === 'fake') {
+        return news.status === 'fake'
+      }
+      return true
     })
   }
   
@@ -365,6 +432,20 @@ const loadNews = async () => {
 
 const setActiveCategory = (category: string) => {
   activeCategory.value = category
+  currentPage.value = 1
+  // Save to localStorage for persistence
+  localStorage.setItem('activeCategory', category)
+}
+
+const setAuthenticityFilter = (filter: string) => {
+  // Toggle filter: if clicking the same filter, deselect it
+  if (activeAuthenticityFilter.value === filter) {
+    activeAuthenticityFilter.value = null
+    localStorage.removeItem('activeAuthenticityFilter')
+  } else {
+    activeAuthenticityFilter.value = filter
+    localStorage.setItem('activeAuthenticityFilter', filter)
+  }
   currentPage.value = 1
 }
 
@@ -524,6 +605,27 @@ const getCategoryCount = (category: string) => {
   }).length
 }
 
+const getAuthenticityCount = (filter: string) => {
+  let filtered = newsList.value
+  
+  // Apply category filter first if not 'all'
+  if (activeCategory.value !== 'all') {
+    filtered = filtered.filter(news => {
+      if (!news.category) return false
+      return news.category.toLowerCase() === activeCategory.value.toLowerCase()
+    })
+  }
+  
+  // Apply authenticity filter
+  if (filter === 'real') {
+    return filtered.filter(news => news.status === 'real').length
+  } else if (filter === 'fake') {
+    return filtered.filter(news => news.status === 'fake').length
+  }
+  
+  return 0
+}
+
 // Watchers
 watch(totalPages, (newTotalPages) => {
   // Auto-correct currentPage if it exceeds totalPages
@@ -538,6 +640,18 @@ watch(totalPages, (newTotalPages) => {
 
 // Lifecycle
 onMounted(() => {
+  // Restore saved filter states from localStorage
+  const savedCategory = localStorage.getItem('activeCategory')
+  const savedAuthenticityFilter = localStorage.getItem('activeAuthenticityFilter')
+  
+  if (savedCategory) {
+    activeCategory.value = savedCategory
+  }
+  
+  if (savedAuthenticityFilter && savedAuthenticityFilter !== 'all') {
+    activeAuthenticityFilter.value = savedAuthenticityFilter
+  }
+  
   loadNews()
 })
 </script>
