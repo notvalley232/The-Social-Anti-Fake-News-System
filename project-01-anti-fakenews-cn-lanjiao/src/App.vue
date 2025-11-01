@@ -13,6 +13,8 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { onMounted, watch } from 'vue'
+import { track } from '@vercel/analytics'
 
 const router = useRouter()
 
@@ -39,6 +41,17 @@ const onEnter = (el: Element) => {
 const onLeave = (el: Element) => {
   // 页面离开时的处理
 }
+
+// 监听路由变化，跟踪页面访问
+watch(() => router.currentRoute.value, (to, from) => {
+  if (to.path !== from?.path) {
+    // 跟踪页面访问
+    track('page_view', {
+      page: to.path,
+      title: (to.meta?.title as string) || (to.name as string) || 'Unknown Page'
+    })
+  }
+}, { immediate: true })
 </script>
 
 <style>
