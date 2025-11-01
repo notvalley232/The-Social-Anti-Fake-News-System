@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "id": "comment_001",
+      "newsId": "news_001",
+      "content": "This is incredible news! Solar technology has been advancing rapidly, and this breakthrough could really change everything. The efficiency improvements mentioned align with recent research trends I've been following.",
+      "imageUrl": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=solar%20panel%20efficiency%20chart%20showing%20improvement%20over%20time&image_size=square",
+      "voteType": "real",
+      "createdAt": "2024-01-15T11:15:00Z",
+      "author": "TechEnthusiast92"
+    },
+    {
+      "id": "comment_002",
+      "newsId": "news_001",
+      "content": "I work in renewable energy, and while this sounds promising, I'd like to see peer-reviewed publications before getting too excited. The efficiency claims seem quite ambitious.",
+      "imageUrl": "",
+      "voteType": "real",
+      "createdAt": "2024-01-15T12:30:00Z",
+      "author": "RenewableExpert"
+    },
+    {
+      "id": "comment_003",
+      "newsId": "news_001",
+      "content": "MIT has a strong track record in materials science. The quantum dot approach has shown promise in laboratory settings. Looking forward to seeing the commercial applications.",
+      "imageUrl": "",
+      "voteType": "real",
+      "createdAt": "2024-01-15T13:45:00Z",
+      "author": "ScienceStudent"
+    },
+    {
+      "id": "comment_004",
+      "newsId": "news_002",
+      "content": "This story has major red flags. I checked WHO's official website and social media - no mention of this supposed outbreak anywhere. The mortality rate described is unrealistic.",
+      "imageUrl": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=WHO%20official%20website%20screenshot%20showing%20no%20emergency%20alerts&image_size=landscape_4_3",
+      "voteType": "fake",
+      "createdAt": "2024-01-14T16:20:00Z",
+      "author": "FactChecker"
+    },
+    {
+      "id": "comment_005",
+      "newsId": "news_002",
+      "content": "Completely fabricated! No credible medical journal has reported this. The supposed doctor doesn't exist in any WHO directory. This is dangerous misinformation.",
+      "imageUrl": "",
+      "voteType": "fake",
+      "createdAt": "2024-01-14T17:10:00Z",
+      "author": "MedicalProfessional"
+    },
+    {
+      "id": "comment_006",
+      "newsId": "news_002",
+      "content": "I was initially worried, but after researching, this appears to be completely false. No legitimate news sources are reporting this story.",
+      "imageUrl": "",
+      "voteType": "fake",
+      "createdAt": "2024-01-14T18:00:00Z",
+      "author": "ConcernedCitizen"
+    },
+    {
+      "id": "comment_007",
+      "newsId": "news_003",
+      "content": "Google's quantum computing achievements are well-documented and peer-reviewed. This represents a genuine milestone in computational science.",
+      "imageUrl": "",
+      "voteType": "real",
+      "createdAt": "2024-01-13T10:30:00Z",
+      "author": "QuantumResearcher"
+    },
+    {
+      "id": "comment_008",
+      "newsId": "news_003",
+      "content": "The Nature publication confirms this is legitimate research. Quantum supremacy is a significant step forward, even if practical applications are still years away.",
+      "imageUrl": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=Nature%20journal%20cover%20featuring%20quantum%20computing%20research&image_size=portrait_4_3",
+      "voteType": "real",
+      "createdAt": "2024-01-13T11:45:00Z",
+      "author": "AcademicReader"
+    },
+    {
+      "id": "comment_009",
+      "newsId": "news_004",
+      "content": "Classic weight loss scam! No supplement can cause 50-pound loss in a week. This violates basic laws of physics and biology. Completely fake.",
+      "imageUrl": "",
+      "voteType": "fake",
+      "createdAt": "2024-01-12T15:00:00Z",
+      "author": "NutritionExpert"
+    },
+    {
+      "id": "comment_010",
+      "newsId": "news_004",
+      "content": "The before/after photos are clearly photoshopped. The celebrity's representatives have already denied this endorsement. Obvious scam.",
+      "imageUrl": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=fake%20before%20after%20photos%20with%20obvious%20digital%20manipulation%20marks&image_size=landscape_4_3",
+      "voteType": "fake",
+      "createdAt": "2024-01-12T16:30:00Z",
+      "author": "PhotoAnalyst"
+    },
+    {
+      "id": "comment_011",
+      "newsId": "news_005",
+      "content": "TESS discoveries are always exciting! The peer-review process and multiple telescope confirmations make this discovery credible. Great work by the research team.",
+      "imageUrl": "",
+      "voteType": "real",
+      "createdAt": "2024-01-11T12:15:00Z",
+      "author": "Astronomer"
+    },
+    {
+      "id": "comment_012",
+      "newsId": "news_005",
+      "content": "The Monthly Notices publication and James Webb follow-up plans confirm this is legitimate science. Exciting times for exoplanet research!",
+      "imageUrl": "",
+      "voteType": "real",
+      "createdAt": "2024-01-11T13:30:00Z",
+      "author": "SpaceExplorer"
+    }
+  ]
+}

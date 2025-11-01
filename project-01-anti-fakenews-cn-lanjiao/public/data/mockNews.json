@@ -1,0 +1,117 @@
+[
+  {
+    "id": "1",
+    "title": "Scientists Discover New Method for Carbon Capture",
+    "summary": "Researchers at MIT have developed a revolutionary carbon capture technology that could significantly reduce atmospheric CO2 levels.",
+    "content": "A team of scientists at the Massachusetts Institute of Technology has announced a breakthrough in carbon capture technology. The new method uses a novel chemical process that can extract CO2 from the atmosphere at a fraction of the current cost. The technology has been tested in laboratory conditions and shows promising results for large-scale implementation. This development could play a crucial role in combating climate change and achieving global carbon neutrality goals.",
+    "imageUrl": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=scientists%20working%20in%20modern%20laboratory%20with%20carbon%20capture%20equipment%20blue%20and%20white%20theme&image_size=landscape_16_9",
+    "category": "Science",
+    "status": "verified",
+    "submittedBy": "Dr. Sarah Chen",
+    "submittedAt": "2024-01-15T10:30:00Z",
+    "verifiedAt": "2024-01-15T14:20:00Z",
+    "sourceUrl": "https://news.mit.edu/carbon-capture-breakthrough",
+    "votes": {
+      "real": 156,
+      "fake": 12,
+      "pending": 8
+    },
+    "confidence": 92,
+    "tags": ["climate", "technology", "research", "environment"],
+    "reporter": "MIT News Office",
+    "views": 2847,
+    "shares": 234
+  },
+  {
+    "id": "2",
+    "title": "Global Climate Summit Addresses Environmental Protection",
+    "summary": "World leaders gather to discuss coordinated response to climate change and environmental protection initiatives.",
+    "content": "The annual Global Climate Summit brought together environmental ministers and climate scientists from 20 major nations to address the growing concern of climate change. The three-day conference focused on developing coordinated environmental policies and sustainability strategies to protect global ecosystems. Key topics included renewable energy transition, carbon emission reduction, and sustainable development goals. Participants agreed on a framework for enhanced cooperation in environmental protection and climate action.",
+    "imageUrl": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=world%20leaders%20meeting%20at%20climate%20summit%20conference%20room%20green%20environment%20theme&image_size=landscape_16_9",
+    "category": "Environment",
+    "status": "verified",
+    "submittedBy": "Economic Reporter",
+    "submittedAt": "2024-01-14T08:15:00Z",
+    "verifiedAt": "2024-01-14T11:45:00Z",
+    "sourceUrl": "https://worldbank.org/economic-summit-2024",
+    "votes": {
+      "real": 203,
+      "fake": 18,
+      "pending": 15
+    },
+    "confidence": 89,
+    "tags": ["economics", "inflation", "policy", "global"],
+    "reporter": "World Bank Press",
+    "views": 3521,
+    "shares": 187
+  },
+  {
+    "id": "3",
+    "title": "Major Investment Fund Announces New Sustainable Finance Initiative",
+    "summary": "Leading investment firm launches groundbreaking sustainable finance program targeting renewable energy and green technology sectors.",
+    "content": "A major international investment fund has announced a $5 billion sustainable finance initiative focused on renewable energy and green technology investments. The program aims to support innovative companies developing clean energy solutions, electric vehicle infrastructure, and carbon capture technologies. The initiative represents a significant shift in investment strategy, prioritizing environmental sustainability alongside financial returns. Industry experts predict this move will influence other major financial institutions to adopt similar sustainable investment approaches.",
+    "imageUrl": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20financial%20investment%20office%20sustainable%20finance%20green%20technology%20professional&image_size=landscape_16_9",
+    "category": "Finance",
+    "status": "pending",
+    "submittedBy": "Dr. Ahmed Hassan",
+    "submittedAt": "2024-01-13T16:20:00Z",
+    "verifiedAt": null,
+    "sourceUrl": "https://archaeology.org/egypt-discovery-2024",
+    "votes": {
+      "real": 89,
+      "fake": 23,
+      "pending": 45
+    },
+    "confidence": 67,
+    "tags": ["archaeology", "egypt", "history", "discovery"],
+    "reporter": "Archaeological Institute",
+    "views": 1892,
+    "shares": 156
+  },
+  {
+    "id": "4",
+    "title": "Tech Giant Announces Revolutionary Quantum Computing Breakthrough",
+    "summary": "Major technology company claims to have achieved quantum supremacy with new 1000-qubit processor.",
+    "content": "A leading technology corporation has announced what they claim is a major breakthrough in quantum computing, unveiling a 1000-qubit quantum processor that allegedly demonstrates quantum supremacy. The company states that their new system can solve complex mathematical problems exponentially faster than traditional computers. However, the announcement has been met with skepticism from some experts in the field who question the validity of the claims and demand independent verification of the results.",
+    "imageUrl": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=futuristic%20quantum%20computer%20laboratory%20high%20tech%20blue%20lighting&image_size=landscape_16_9",
+    "category": "Technology",
+    "status": "disputed",
+    "submittedBy": "Tech Journalist",
+    "submittedAt": "2024-01-12T12:00:00Z",
+    "verifiedAt": null,
+    "sourceUrl": "https://techcorp.com/quantum-announcement",
+    "votes": {
+      "real": 67,
+      "fake": 134,
+      "pending": 89
+    },
+    "confidence": 34,
+    "tags": ["quantum", "computing", "technology", "breakthrough"],
+    "reporter": "TechCorp Press Release",
+    "views": 4567,
+    "shares": 423
+  },
+  {
+    "id": "5",
+    "title": "Medical Researchers Develop New Treatment for Rare Disease",
+    "summary": "Clinical trials show promising results for gene therapy treatment of a rare genetic disorder affecting children.",
+    "content": "Researchers at Johns Hopkins University have announced successful Phase II clinical trials for a new gene therapy treatment targeting a rare genetic disorder that affects approximately 1 in 100,000 children worldwide. The treatment uses modified viruses to deliver corrective genes to affected cells, showing significant improvement in patient outcomes with minimal side effects. The therapy is now moving to Phase III trials and could potentially receive FDA approval within the next two years.",
+    "imageUrl": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=medical%20research%20laboratory%20gene%20therapy%20equipment%20clean%20white%20environment&image_size=landscape_16_9",
+    "category": "Health",
+    "status": "verified",
+    "submittedBy": "Medical Correspondent",
+    "submittedAt": "2024-01-11T09:30:00Z",
+    "verifiedAt": "2024-01-11T15:10:00Z",
+    "sourceUrl": "https://hopkinsmedicine.org/gene-therapy-breakthrough",
+    "votes": {
+      "real": 298,
+      "fake": 7,
+      "pending": 12
+    },
+    "confidence": 95,
+    "tags": ["medicine", "gene-therapy", "research", "children"],
+    "reporter": "Johns Hopkins Medicine",
+    "views": 2156,
+    "shares": 289
+  }
+]

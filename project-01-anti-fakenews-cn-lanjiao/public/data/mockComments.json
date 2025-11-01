@@ -1,0 +1,167 @@
+[
+  {
+    "id": "c1",
+    "newsId": "1",
+    "userId": "user123",
+    "username": "ClimateExpert",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=professional%20scientist%20avatar%20blue%20theme&image_size=square",
+    "content": "This is indeed a significant breakthrough. I've been following MIT's carbon capture research for years, and this new method addresses many of the cost and scalability issues that have plagued previous technologies.",
+    "createdAt": "2024-01-15T15:30:00Z",
+    "votes": {
+      "helpful": 23,
+      "unhelpful": 2
+    },
+    "verified": true,
+    "expertise": "Environmental Science PhD"
+  },
+  {
+    "id": "c2",
+    "newsId": "1",
+    "userId": "user456",
+    "username": "TechSkeptic",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=thoughtful%20person%20avatar%20neutral%20expression&image_size=square",
+    "content": "While this sounds promising, we should wait for peer review and independent verification before getting too excited. Remember the cold fusion claims from decades ago?",
+    "createdAt": "2024-01-15T16:45:00Z",
+    "votes": {
+      "helpful": 18,
+      "unhelpful": 5
+    },
+    "verified": false,
+    "expertise": null
+  },
+  {
+    "id": "c3",
+    "newsId": "1",
+    "userId": "user789",
+    "username": "GreenFuture",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=environmental%20activist%20avatar%20green%20theme&image_size=square",
+    "content": "This could be a game-changer for climate action! If the technology can be scaled up economically, it might help us reach carbon neutrality faster than expected.",
+    "createdAt": "2024-01-15T17:20:00Z",
+    "votes": {
+      "helpful": 15,
+      "unhelpful": 3
+    },
+    "verified": false,
+    "expertise": null
+  },
+  {
+    "id": "c4",
+    "newsId": "2",
+    "userId": "user234",
+    "username": "EconAnalyst",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=business%20analyst%20avatar%20professional%20blue%20suit&image_size=square",
+    "content": "The coordination between central banks is crucial right now. The inflation we're seeing is largely supply-chain driven, so monetary policy alone won't solve it completely.",
+    "createdAt": "2024-01-14T12:15:00Z",
+    "votes": {
+      "helpful": 31,
+      "unhelpful": 4
+    },
+    "verified": true,
+    "expertise": "Economics PhD, Former Fed Analyst"
+  },
+  {
+    "id": "c5",
+    "newsId": "2",
+    "userId": "user567",
+    "username": "MarketWatcher",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=financial%20trader%20avatar%20serious%20expression&image_size=square",
+    "content": "Markets have been volatile all week leading up to this summit. The framework they agreed on seems reasonable, but implementation will be the real test.",
+    "createdAt": "2024-01-14T13:30:00Z",
+    "votes": {
+      "helpful": 12,
+      "unhelpful": 1
+    },
+    "verified": false,
+    "expertise": null
+  },
+  {
+    "id": "c6",
+    "newsId": "3",
+    "userId": "user890",
+    "username": "HistoryBuff",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=historian%20avatar%20scholarly%20appearance&image_size=square",
+    "content": "Fascinating discovery! The hieroglyphic inscriptions mentioned could provide new insights into the transition period between the Old and Middle Kingdoms.",
+    "createdAt": "2024-01-13T18:45:00Z",
+    "votes": {
+      "helpful": 27,
+      "unhelpful": 2
+    },
+    "verified": true,
+    "expertise": "Egyptology Professor"
+  },
+  {
+    "id": "c7",
+    "newsId": "3",
+    "userId": "user345",
+    "username": "ArcheoStudent",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=young%20archaeology%20student%20avatar%20enthusiastic&image_size=square",
+    "content": "I'm studying archaeology and this is exactly the kind of discovery that makes me excited about the field! Can't wait to read the full research paper.",
+    "createdAt": "2024-01-13T19:20:00Z",
+    "votes": {
+      "helpful": 8,
+      "unhelpful": 0
+    },
+    "verified": false,
+    "expertise": null
+  },
+  {
+    "id": "c8",
+    "newsId": "4",
+    "userId": "user678",
+    "username": "QuantumPhysicist",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=quantum%20physicist%20avatar%20lab%20coat&image_size=square",
+    "content": "I'm highly skeptical of these claims. True quantum supremacy requires very specific conditions and independent verification. The company's previous announcements have been overstated.",
+    "createdAt": "2024-01-12T14:30:00Z",
+    "votes": {
+      "helpful": 45,
+      "unhelpful": 8
+    },
+    "verified": true,
+    "expertise": "Quantum Computing Researcher, IBM"
+  },
+  {
+    "id": "c9",
+    "newsId": "4",
+    "userId": "user901",
+    "username": "TechEnthusiast",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=tech%20enthusiast%20avatar%20excited%20expression&image_size=square",
+    "content": "Even if the claims are exaggerated, any progress in quantum computing is exciting! The potential applications are mind-blowing.",
+    "createdAt": "2024-01-12T15:45:00Z",
+    "votes": {
+      "helpful": 12,
+      "unhelpful": 15
+    },
+    "verified": false,
+    "expertise": null
+  },
+  {
+    "id": "c10",
+    "newsId": "5",
+    "userId": "user012",
+    "username": "MedicalDoctor",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=medical%20doctor%20avatar%20white%20coat%20stethoscope&image_size=square",
+    "content": "As a pediatrician, I'm incredibly hopeful about this treatment. Rare genetic disorders are devastating for families, and gene therapy offers real hope where traditional treatments have failed.",
+    "createdAt": "2024-01-11T16:20:00Z",
+    "votes": {
+      "helpful": 38,
+      "unhelpful": 1
+    },
+    "verified": true,
+    "expertise": "Pediatric Medicine, Children's Hospital"
+  },
+  {
+    "id": "c11",
+    "newsId": "5",
+    "userId": "user123",
+    "username": "ParentAdvocate",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=parent%20advocate%20avatar%20caring%20expression&image_size=square",
+    "content": "My daughter has this condition. We've been waiting for years for a breakthrough like this. Thank you to all the researchers working on this!",
+    "createdAt": "2024-01-11T17:10:00Z",
+    "votes": {
+      "helpful": 52,
+      "unhelpful": 0
+    },
+    "verified": false,
+    "expertise": null
+  }
+]

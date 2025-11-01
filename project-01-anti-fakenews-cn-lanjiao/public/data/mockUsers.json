@@ -1,0 +1,242 @@
+[
+  {
+    "id": "user123",
+    "username": "ClimateExpert",
+    "email": "climate.expert@university.edu",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=professional%20scientist%20avatar%20blue%20theme&image_size=square",
+    "role": "verified_expert",
+    "expertise": "Environmental Science PhD",
+    "institution": "MIT Environmental Lab",
+    "joinedAt": "2023-06-15T10:00:00Z",
+    "stats": {
+      "newsSubmitted": 23,
+      "votesGiven": 456,
+      "commentsPosted": 89,
+      "accuracyScore": 94,
+      "reputation": 2847
+    },
+    "badges": ["Expert Contributor", "Fact Checker", "Climate Specialist"],
+    "verified": true,
+    "preferences": {
+      "emailNotifications": true,
+      "categories": ["Science", "Environment", "Technology"],
+      "theme": "light"
+    }
+  },
+  {
+    "id": "user456",
+    "username": "TechSkeptic",
+    "email": "skeptic@email.com",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=thoughtful%20person%20avatar%20neutral%20expression&image_size=square",
+    "role": "community_member",
+    "expertise": null,
+    "institution": null,
+    "joinedAt": "2023-09-22T14:30:00Z",
+    "stats": {
+      "newsSubmitted": 5,
+      "votesGiven": 234,
+      "commentsPosted": 67,
+      "accuracyScore": 78,
+      "reputation": 892
+    },
+    "badges": ["Critical Thinker", "Active Voter"],
+    "verified": false,
+    "preferences": {
+      "emailNotifications": false,
+      "categories": ["Technology", "Science"],
+      "theme": "dark"
+    }
+  },
+  {
+    "id": "user789",
+    "username": "GreenFuture",
+    "email": "green.future@activist.org",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=environmental%20activist%20avatar%20green%20theme&image_size=square",
+    "role": "community_member",
+    "expertise": null,
+    "institution": "Environmental Action Group",
+    "joinedAt": "2023-08-10T09:15:00Z",
+    "stats": {
+      "newsSubmitted": 12,
+      "votesGiven": 189,
+      "commentsPosted": 45,
+      "accuracyScore": 82,
+      "reputation": 567
+    },
+    "badges": ["Environmental Advocate", "News Contributor"],
+    "verified": false,
+    "preferences": {
+      "emailNotifications": true,
+      "categories": ["Environment", "Politics", "Science"],
+      "theme": "light"
+    }
+  },
+  {
+    "id": "user234",
+    "username": "EconAnalyst",
+    "email": "econ.analyst@bank.com",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=business%20analyst%20avatar%20professional%20blue%20suit&image_size=square",
+    "role": "verified_expert",
+    "expertise": "Economics PhD, Former Fed Analyst",
+    "institution": "Federal Reserve Bank",
+    "joinedAt": "2023-05-03T11:20:00Z",
+    "stats": {
+      "newsSubmitted": 18,
+      "votesGiven": 312,
+      "commentsPosted": 156,
+      "accuracyScore": 91,
+      "reputation": 1923
+    },
+    "badges": ["Economics Expert", "Trusted Analyst", "Top Contributor"],
+    "verified": true,
+    "preferences": {
+      "emailNotifications": true,
+      "categories": ["Economics", "Politics", "Business"],
+      "theme": "light"
+    }
+  },
+  {
+    "id": "user567",
+    "username": "MarketWatcher",
+    "email": "market.watcher@trading.com",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=financial%20trader%20avatar%20serious%20expression&image_size=square",
+    "role": "community_member",
+    "expertise": null,
+    "institution": "Trading Firm",
+    "joinedAt": "2023-11-08T16:45:00Z",
+    "stats": {
+      "newsSubmitted": 7,
+      "votesGiven": 145,
+      "commentsPosted": 23,
+      "accuracyScore": 76,
+      "reputation": 234
+    },
+    "badges": ["Market Observer"],
+    "verified": false,
+    "preferences": {
+      "emailNotifications": false,
+      "categories": ["Economics", "Business"],
+      "theme": "dark"
+    }
+  },
+  {
+    "id": "user890",
+    "username": "HistoryBuff",
+    "email": "history.prof@university.edu",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=historian%20avatar%20scholarly%20appearance&image_size=square",
+    "role": "verified_expert",
+    "expertise": "Egyptology Professor",
+    "institution": "University History Department",
+    "joinedAt": "2023-07-12T13:30:00Z",
+    "stats": {
+      "newsSubmitted": 15,
+      "votesGiven": 278,
+      "commentsPosted": 92,
+      "accuracyScore": 89,
+      "reputation": 1456
+    },
+    "badges": ["History Expert", "Archaeological Specialist", "Academic"],
+    "verified": true,
+    "preferences": {
+      "emailNotifications": true,
+      "categories": ["History", "Culture", "Science"],
+      "theme": "light"
+    }
+  },
+  {
+    "id": "user345",
+    "username": "ArcheoStudent",
+    "email": "archeo.student@university.edu",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=young%20archaeology%20student%20avatar%20enthusiastic&image_size=square",
+    "role": "community_member",
+    "expertise": null,
+    "institution": "University Archaeology Program",
+    "joinedAt": "2023-12-01T08:00:00Z",
+    "stats": {
+      "newsSubmitted": 3,
+      "votesGiven": 67,
+      "commentsPosted": 12,
+      "accuracyScore": 85,
+      "reputation": 123
+    },
+    "badges": ["New Member", "Student"],
+    "verified": false,
+    "preferences": {
+      "emailNotifications": true,
+      "categories": ["History", "Science", "Education"],
+      "theme": "light"
+    }
+  },
+  {
+    "id": "user678",
+    "username": "QuantumPhysicist",
+    "email": "quantum.physicist@ibm.com",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=quantum%20physicist%20avatar%20lab%20coat&image_size=square",
+    "role": "verified_expert",
+    "expertise": "Quantum Computing Researcher, IBM",
+    "institution": "IBM Research",
+    "joinedAt": "2023-04-20T12:15:00Z",
+    "stats": {
+      "newsSubmitted": 21,
+      "votesGiven": 389,
+      "commentsPosted": 134,
+      "accuracyScore": 96,
+      "reputation": 3245
+    },
+    "badges": ["Quantum Expert", "Top Researcher", "IBM Fellow", "Fact Checker"],
+    "verified": true,
+    "preferences": {
+      "emailNotifications": true,
+      "categories": ["Technology", "Science", "Research"],
+      "theme": "dark"
+    }
+  },
+  {
+    "id": "user901",
+    "username": "TechEnthusiast",
+    "email": "tech.enthusiast@gmail.com",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=tech%20enthusiast%20avatar%20excited%20expression&image_size=square",
+    "role": "community_member",
+    "expertise": null,
+    "institution": null,
+    "joinedAt": "2023-10-15T19:30:00Z",
+    "stats": {
+      "newsSubmitted": 8,
+      "votesGiven": 156,
+      "commentsPosted": 34,
+      "accuracyScore": 72,
+      "reputation": 345
+    },
+    "badges": ["Tech Enthusiast"],
+    "verified": false,
+    "preferences": {
+      "emailNotifications": true,
+      "categories": ["Technology", "Science", "Gaming"],
+      "theme": "dark"
+    }
+  },
+  {
+    "id": "user012",
+    "username": "MedicalDoctor",
+    "email": "medical.doctor@hospital.org",
+    "avatar": "https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=medical%20doctor%20avatar%20white%20coat%20stethoscope&image_size=square",
+    "role": "verified_expert",
+    "expertise": "Pediatric Medicine, Children's Hospital",
+    "institution": "Children's Medical Center",
+    "joinedAt": "2023-03-08T07:45:00Z",
+    "stats": {
+      "newsSubmitted": 19,
+      "votesGiven": 267,
+      "commentsPosted": 78,
+      "accuracyScore": 93,
+      "reputation": 2156
+    },
+    "badges": ["Medical Expert", "Pediatric Specialist", "Healthcare Professional"],
+    "verified": true,
+    "preferences": {
+      "emailNotifications": true,
+      "categories": ["Health", "Science", "Research"],
+      "theme": "light"
+    }
+  }
+]
