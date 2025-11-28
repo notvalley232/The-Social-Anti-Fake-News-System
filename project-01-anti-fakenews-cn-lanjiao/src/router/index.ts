@@ -36,6 +36,15 @@ const routes = [
     }
   },
   {
+    path: '/news/:id/edit',
+    name: 'news-edit',
+    component: () => import('@/pages/EditNewsPage.vue'),
+    meta: {
+      title: 'Edit News - Anti-Fake News System',
+      description: 'Edit a news article'
+    }
+  },
+  {
     path: '/fact-check',
     name: 'fact-check',
     component: () => import('@/pages/SearchPage.vue'),
