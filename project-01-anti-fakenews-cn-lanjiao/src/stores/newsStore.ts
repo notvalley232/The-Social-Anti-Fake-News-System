@@ -266,6 +266,30 @@ export const useNewsStore = defineStore('news', () => {
     }
   }
 
+  const updateNews = async (id: string, newsData: Partial<News>) => {
+    try {
+      loading.value = true
+      error.value = null
+      const updated = await dataService.updateNews(id, newsData)
+      // Update list
+      const idx = newsList.value.findIndex(n => n.id === id)
+      if (idx !== -1) {
+        newsList.value[idx] = { ...newsList.value[idx], ...updated }
+      }
+      // Update current news if open
+      if (currentNews.value?.id === id) {
+        currentNews.value = { ...currentNews.value, ...updated }
+      }
+      return updated
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to update news'
+      console.error('Error updating news:', err)
+      return null
+    } finally {
+      loading.value = false
+    }
+  }
+
   const deleteNews = async (id: string) => {
     try {
       loading.value = true
@@ -397,6 +421,7 @@ export const useNewsStore = defineStore('news', () => {
     searchNews,
     submitVote,
     submitNews,
+    updateNews,
     deleteNews,
     fetchComments,
     fetchCommentsByNewsId: fetchComments,

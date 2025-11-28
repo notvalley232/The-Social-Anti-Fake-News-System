@@ -251,6 +251,19 @@ export class DataService {
     return response.json()
   }
 
+  async updateNewsToAPI(id: string, news: Partial<News>): Promise<News> {
+    const response = await fetch(`${this.apiBaseUrl}/news/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(news)
+    })
+    if (!response.ok) {
+      const text = await response.text().catch(() => '')
+      throw new Error(`Failed to update news (${response.status}): ${text}`)
+    }
+    return await response.json()
+  }
+
   // Wrapper methods for current implementation
   async getAllNews(): Promise<News[]> {
     return this.loadNewsData()
@@ -271,6 +284,10 @@ export class DataService {
 
   async submitNews(news: Omit<News, 'id' | 'createdAt' | 'status' | 'fakeVotes' | 'realVotes'>): Promise<News> {
     return await this.submitNewsToAPI(news)
+  }
+
+  async updateNews(id: string, news: Partial<News>): Promise<News> {
+    return await this.updateNewsToAPI(id, news)
   }
 
   async submitComment(comment: Omit<Comment, 'id' | 'createdAt'>): Promise<Comment> {

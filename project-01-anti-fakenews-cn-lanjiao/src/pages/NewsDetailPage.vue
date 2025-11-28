@@ -38,6 +38,13 @@
               <span class="hidden md:inline text-sm">Save</span>
             </button>
             <button 
+              @click="goToEdit"
+              class="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-2 text-blue-600 hover:text-white hover:bg-blue-600 rounded-lg transition-all duration-200"
+            >
+              <Pencil class="w-4 h-4" />
+              <span class="hidden md:inline text-sm">Edit</span>
+            </button>
+            <button 
               @click="deleteCurrentNews"
               class="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-2 text-red-600 hover:text-white hover:bg-red-600 rounded-lg transition-all duration-200"
             >
@@ -355,7 +362,8 @@ import {
   Eye, 
   ExternalLink, 
   AlertCircle, 
-  RefreshCw 
+  RefreshCw,
+  Pencil
 } from 'lucide-vue-next'
 import NavigationOverlay from '@/components/NavigationOverlay.vue'
 import { useNewsStore } from '@/stores/newsStore'
@@ -594,6 +602,13 @@ const shareNews = () => {
 const bookmarkNews = () => {
   // 实现书签功能
   console.log('Bookmark news')
+}
+
+const goToEdit = () => {
+  const id = route.params.id as string
+  if (id) {
+    router.push(`/news/${id}/edit`)
+  }
 }
 
 const deleteCurrentNews = async () => {
