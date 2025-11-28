@@ -5,6 +5,8 @@ import SearchPage from '@/pages/SearchPage.vue'
 import SubmitNewsPage from '@/pages/SubmitNewsPage.vue'
 import AboutPage from '@/pages/AboutPage.vue'
 import ComingSoonPage from '@/pages/ComingSoonPage.vue'
+import LoginPage from '@/pages/LoginPage.vue'
+import RegisterPage from '@/pages/RegisterPage.vue'
 
 // Define route configurations
 const routes = [
@@ -69,6 +71,24 @@ const routes = [
     meta: {
       title: 'About - Anti-Fake News System',
       description: 'Learn about our mission to combat misinformation'
+    }
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginPage,
+    meta: {
+      title: 'Login - Anti-Fake News System',
+      description: 'Sign in to participate and submit content'
+    }
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: RegisterPage,
+    meta: {
+      title: 'Register - Anti-Fake News System',
+      description: 'Create an account to join the community'
     }
   },
   {
@@ -149,6 +169,19 @@ router.beforeEach((to, from, next) => {
   // Add loading state (can be used with Pinia store)
   // This will be implemented when we set up the store
   
+  if (to.name === 'submit-news') {
+    const raw = localStorage.getItem('current_user')
+    const user = raw ? JSON.parse(raw) : null
+    const role = user?.role || 'user'
+    if (!user) return next({ name: 'login' })
+    if (!['MEMBER', 'ADMIN'].includes(role)) return next({ name: 'login' })
+  }
+  if (to.name === 'admin') {
+    const raw = localStorage.getItem('current_user')
+    const user = raw ? JSON.parse(raw) : null
+    const role = user?.role || 'user'
+    if (!user || role !== 'ADMIN') return next({ name: 'login' })
+  }
   next()
 })
 
