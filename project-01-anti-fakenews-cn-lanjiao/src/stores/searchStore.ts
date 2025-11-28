@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { News, FilterConfig } from '@/types'
+import { dataService } from '@/services/dataService'
 
 interface SearchResult {
   news: News[]
@@ -121,24 +122,31 @@ export const useSearchStore = defineStore('search', () => {
       // Reset pagination
       currentPage.value = 1
       
-      // Simulate API call - in real app, this would be an actual API request
-      await new Promise(resolve => setTimeout(resolve, 300))
-      
-      // Mock search implementation
-      const results = await mockSearch(currentQuery.value, currentFilters.value)
-      
-      searchResults.value = results.news
-      totalResults.value = results.totalCount
+      // Server-side search by title
+      const serverResults = await dataService.searchNewsByTitle(currentQuery.value)
+      // Apply client-side filters
+      const filtered = serverResults.filter(n => {
+        const matchCategory = currentFilters.value.category && currentFilters.value.category !== 'all'
+          ? n.category?.toLowerCase() === currentFilters.value.category.toLowerCase()
+          : true
+        const matchStatus = currentFilters.value.status && currentFilters.value.status !== 'all'
+          ? n.status?.toLowerCase() === currentFilters.value.status.toLowerCase()
+          : true
+        return matchCategory && matchStatus
+      })
+
+      searchResults.value = filtered
+      totalResults.value = filtered.length
       searchTime.value = performance.now() - startTime
-      hasMoreResults.value = results.totalCount > pageSize.value
+      hasMoreResults.value = filtered.length > pageSize.value
       
       // Add to search history
-      addToSearchHistory(currentQuery.value, currentFilters.value, results.totalCount)
+      addToSearchHistory(currentQuery.value, currentFilters.value, filtered.length)
       
       return {
         success: true,
-        results: results.news,
-        totalCount: results.totalCount,
+        results: filtered,
+        totalCount: filtered.length,
         searchTime: searchTime.value
       }
     } catch (err) {
@@ -159,17 +167,7 @@ export const useSearchStore = defineStore('search', () => {
       loading.value = true
       currentPage.value++
       
-      // Simulate loading more results
-      await new Promise(resolve => setTimeout(resolve, 200))
-      
-      const results = await mockSearch(
-        currentQuery.value, 
-        currentFilters.value, 
-        currentPage.value
-      )
-      
-      // Append new results
-      searchResults.value.push(...results.news)
+      // With backend-driven list, recompute hasMore based on totalResults
       hasMoreResults.value = searchResults.value.length < totalResults.value
       
     } catch (err) {
@@ -301,38 +299,7 @@ export const useSearchStore = defineStore('search', () => {
   }
 
   // Mock search function (replace with actual API call)
-  const mockSearch = async (
-    query: string, 
-    filters: FilterConfig, 
-    page: number = 1
-  ): Promise<{ news: News[]; totalCount: number }> => {
-    // This would be replaced with actual API call
-    // For now, return mock data based on search parameters
-    
-    const mockNews: News[] = [
-      {
-        id: 'search_result_1',
-        title: `Search result for "${query}" - Breaking News`,
-        summary: `This is a search result summary for the query "${query}". It contains relevant information about the topic.`,
-        content: 'Full content would be here...',
-        imageUrl: 'https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=news%20search%20result%20image&image_size=landscape_4_3',
-        reporter: 'Search Reporter',
-        createdAt: new Date().toISOString(),
-        category: filters.category === 'all' ? 'technology' : filters.category,
-        status: filters.status === 'all' ? 'real' : filters.status as 'real' | 'fake' | 'pending',
-        realVotes: Math.floor(Math.random() * 100),
-        fakeVotes: Math.floor(Math.random() * 50)
-      }
-    ]
-    
-    // Simulate different result counts based on query
-    const resultCount = Math.floor(Math.random() * 100) + 10
-    
-    return {
-      news: mockNews,
-      totalCount: resultCount
-    }
-  }
+  // remove mockSearch
 
   const clearError = () => {
     error.value = null

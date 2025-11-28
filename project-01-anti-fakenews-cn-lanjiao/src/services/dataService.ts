@@ -1,15 +1,10 @@
 // Data service for handling JSON data and future API integration
 import type { News, Comment, Vote } from '@/types'
 
-// Import JSON data (fallback for local development)
-import newsData from '@/data/mockNews.json'
-import commentsData from '@/data/mockComments.json'
-import votesData from '@/data/mockVotes.json'
-
 export class DataService {
   private static instance: DataService
-  private apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
-  private useExternalAPI: boolean = import.meta.env.VITE_USE_EXTERNAL_API === 'true' || false
+  private apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081'
+  private useExternalAPI: boolean = true
 
   private constructor() {}
 
@@ -37,37 +32,7 @@ export class DataService {
     return this.useExternalAPI
   }
 
-  // Local JSON data loading methods (fallback)
-  private async loadNewsDataFromJSON(): Promise<News[]> {
-    try {
-      // Simulate API delay for realistic behavior
-      await new Promise(resolve => setTimeout(resolve, 300))
-      return newsData.news as News[]
-    } catch (error) {
-      console.error('Error loading news data from JSON:', error)
-      throw new Error('Failed to load news data from JSON')
-    }
-  }
-
-  private async loadCommentsDataFromJSON(): Promise<Comment[]> {
-    try {
-      await new Promise(resolve => setTimeout(resolve, 200))
-      return commentsData.comments as Comment[]
-    } catch (error) {
-      console.error('Error loading comments data from JSON:', error)
-      throw new Error('Failed to load comments data from JSON')
-    }
-  }
-
-  private async loadVotesDataFromJSON(): Promise<Vote[]> {
-    try {
-      await new Promise(resolve => setTimeout(resolve, 100))
-      return votesData.votes as Vote[]
-    } catch (error) {
-      console.error('Error loading votes data from JSON:', error)
-      throw new Error('Failed to load votes data from JSON')
-    }
-  }
+  // Local JSON loading removed
 
   // API data loading methods
   private async fetchFromAPI(endpoint: string): Promise<any> {
@@ -83,9 +48,34 @@ export class DataService {
     }
   }
 
+  async uploadImage(file: File): Promise<string> {
+    const formData = new FormData()
+    formData.append('file', file)
+    const res = await fetch(`${this.apiBaseUrl}/uploadImage`, {
+      method: 'POST',
+      body: formData
+    })
+    if (!res.ok) {
+      throw new Error('Failed to upload image')
+    }
+    const data = await res.json()
+    if (typeof data?.name === 'string') {
+      return data.name
+    }
+    if (Array.isArray(data) && data[0]?.name) {
+      return data[0].name
+    }
+    throw new Error('Invalid upload response')
+  }
+
   private async loadNewsDataFromAPI(): Promise<News[]> {
     const data = await this.fetchFromAPI('/mockNews.json')
     return data.news || data // Handle both {news: [...]} and [...] formats
+  }
+
+  async searchNewsByTitle(query: string): Promise<News[]> {
+    const res = await this.fetchFromAPI(`/news/search?q=${encodeURIComponent(query)}`)
+    return Array.isArray(res) ? res : (res.news || [])
   }
 
   private async loadCommentsDataFromAPI(): Promise<Comment[]> {
@@ -103,44 +93,17 @@ export class DataService {
     return data.users || data // Handle both {users: [...]} and [...] formats
   }
 
-  // Unified data loading methods with fallback
+  // Unified data loading methods
   async loadNewsData(): Promise<News[]> {
-    if (this.useExternalAPI) {
-      try {
-        return await this.loadNewsDataFromAPI()
-      } catch (error) {
-        console.warn('Failed to load from external API, falling back to local JSON:', error)
-        return await this.loadNewsDataFromJSON()
-      }
-    } else {
-      return await this.loadNewsDataFromJSON()
-    }
+    return await this.loadNewsDataFromAPI()
   }
 
   async loadCommentsData(): Promise<Comment[]> {
-    if (this.useExternalAPI) {
-      try {
-        return await this.loadCommentsDataFromAPI()
-      } catch (error) {
-        console.warn('Failed to load from external API, falling back to local JSON:', error)
-        return await this.loadCommentsDataFromJSON()
-      }
-    } else {
-      return await this.loadCommentsDataFromJSON()
-    }
+    return await this.loadCommentsDataFromAPI()
   }
 
   async loadVotesData(): Promise<Vote[]> {
-    if (this.useExternalAPI) {
-      try {
-        return await this.loadVotesDataFromAPI()
-      } catch (error) {
-        console.warn('Failed to load from external API, falling back to local JSON:', error)
-        return await this.loadVotesDataFromJSON()
-      }
-    } else {
-      return await this.loadVotesDataFromJSON()
-    }
+    return await this.loadVotesDataFromAPI()
   }
 
   async loadUsersData(): Promise<any[]> {
@@ -291,62 +254,24 @@ export class DataService {
   }
 
   async submitVote(voteData: { newsId: string; voteType: 'real' | 'fake'; createdAt: string }): Promise<Vote> {
-    if (this.useExternalAPI) {
-      try {
-        return await this.submitVoteToAPI(voteData.newsId, voteData.voteType)
-      } catch (error) {
-        console.warn('Failed to submit vote to API, using local simulation:', error)
-      }
-    }
-    
-    // Local simulation fallback
-    const newVote: Vote = {
-      id: Date.now().toString(),
-      newsId: voteData.newsId,
-      userId: 'current-user', // This would come from auth
-      voteType: voteData.voteType,
-      createdAt: voteData.createdAt
-    }
-    return newVote
+    return await this.submitVoteToAPI(voteData.newsId, voteData.voteType)
   }
 
   async submitNews(news: Omit<News, 'id' | 'createdAt' | 'status' | 'fakeVotes' | 'realVotes'>): Promise<News> {
-    if (this.useExternalAPI) {
-      try {
-        return await this.submitNewsToAPI(news)
-      } catch (error) {
-        console.warn('Failed to submit news to API, using local simulation:', error)
-      }
-    }
-    
-    // Local simulation fallback
-    const newNews: News = {
-      ...news,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      status: 'pending' as const,
-      fakeVotes: 0,
-      realVotes: 0
-    }
-    return newNews
+    return await this.submitNewsToAPI(news)
   }
 
   async submitComment(comment: Omit<Comment, 'id' | 'createdAt'>): Promise<Comment> {
-    if (this.useExternalAPI) {
-      try {
-        return await this.submitCommentToAPI(comment.newsId, comment)
-      } catch (error) {
-        console.warn('Failed to submit comment to API, using local simulation:', error)
-      }
+    return await this.submitCommentToAPI(comment.newsId, comment)
+  }
+
+  async deleteNews(id: string): Promise<void> {
+    const res = await fetch(`${this.apiBaseUrl}/news/${encodeURIComponent(id)}`, {
+      method: 'DELETE'
+    })
+    if (!res.ok && res.status !== 204) {
+      throw new Error('Failed to delete news')
     }
-    
-    // Local simulation fallback
-    const newComment: Comment = {
-      ...comment,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
-    }
-    return newComment
   }
 }
 

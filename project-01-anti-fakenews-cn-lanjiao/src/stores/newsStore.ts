@@ -253,26 +253,34 @@ export const useNewsStore = defineStore('news', () => {
       loading.value = true
       error.value = null
       
-      const newNews = {
-        ...newsData,
-        id: `news_${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        status: 'pending' as const,
-        realVotes: 0,
-        fakeVotes: 0
-      } as News
-
-      await dataService.submitNews(newNews)
-      
-      // Add to local state
-      newsList.value.unshift(newNews)
+      const created = await dataService.submitNews(newsData as any)
+      newsList.value.unshift(created)
       totalCount.value++
-
-      return newNews
+      return created
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to submit news'
       console.error('Error submitting news:', err)
       return null
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const deleteNews = async (id: string) => {
+    try {
+      loading.value = true
+      error.value = null
+      await dataService.deleteNews(id)
+      newsList.value = newsList.value.filter(n => n.id !== id)
+      totalCount.value = newsList.value.length
+      if (currentNews.value?.id === id) {
+        currentNews.value = null
+      }
+      return true
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to delete news'
+      console.error('Error deleting news:', err)
+      return false
     } finally {
       loading.value = false
     }
@@ -389,6 +397,7 @@ export const useNewsStore = defineStore('news', () => {
     searchNews,
     submitVote,
     submitNews,
+    deleteNews,
     fetchComments,
     fetchCommentsByNewsId: fetchComments,
     submitComment,

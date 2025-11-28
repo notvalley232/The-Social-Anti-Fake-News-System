@@ -3,48 +3,6 @@
     <!-- Navigation -->
     <NavigationOverlay />
     
-    <!-- Message Modal -->
-    <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center">
-      <!-- Backdrop -->
-      <div class="absolute inset-0 bg-black bg-opacity-50" @click="closeModal"></div>
-      
-      <!-- Modal Content -->
-      <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">Information</h3>
-          <button
-            @click="closeModal"
-            class="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
-        
-        <div class="mb-6">
-          <div class="flex items-center mb-3">
-            <div class="flex-shrink-0">
-              <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <div class="ml-3">
-              <p class="text-gray-700">This feature is not yet implemented</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="flex justify-end">
-          <button
-            @click="closeModal"
-            class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            OK
-          </button>
-        </div>
-      </div>
-    </div>
     
     <!-- Main Content -->
     <main class="pt-20 pb-12">
@@ -112,23 +70,35 @@
                 <p v-if="errors.content" class="mt-1 text-sm text-red-600">{{ errors.content }}</p>
               </div>
 
-              <!-- Image URL -->
+              <!-- Image Upload -->
               <div>
-                <label for="imageUrl" class="block text-sm font-medium text-text-primary mb-2">
-                  Image URL
-                </label>
+                <h3 class="text-center text-lg font-semibold text-gray-900 mb-3">The image of new</h3>
                 <input
-                  id="imageUrl"
-                  v-model="form.imageUrl"
-                  type="url"
-                  placeholder="https://example.com/image.jpg"
-                  class="input w-full"
-                  :class="{ 'border-red-300': errors.imageUrl }"
+                  id="imageFile"
+                  type="file"
+                  accept="image/*"
+                  @change="onFileChange"
+                  class="sr-only"
                 />
-                <p v-if="errors.imageUrl" class="mt-1 text-sm text-red-600">{{ errors.imageUrl }}</p>
-                <p class="mt-1 text-sm text-text-secondary">
-                  Optional: Provide a URL to an image related to this news
-                </p>
+                <div class="border rounded-lg p-4">
+                  <div class="grid grid-cols-2 gap-4">
+                    <label for="imageFile" class="flex items-center justify-center border-2 border-dashed rounded-lg h-32 cursor-pointer hover:border-primary-500">
+                      <Plus class="w-10 h-10 text-primary-500" />
+                    </label>
+                    <div v-if="imagePreview" class="relative border rounded-lg overflow-hidden h-32">
+                      <img :src="imagePreview" alt="preview" class="w-full h-full object-cover" />
+                      <button @click="removeImage" type="button" class="absolute top-2 right-2 bg-white text-gray-700 rounded-full shadow w-7 h-7 flex items-center justify-center">
+                        ×
+                      </button>
+                    </div>
+                    <div v-else class="flex items-center justify-center text-sm text-gray-600 border rounded-lg h-32">
+                      No file selected
+                    </div>
+                  </div>
+                  <p class="mt-2 text-sm text-text-secondary">
+                    Upload related image. Supported: jpg, jpeg, png, gif
+                  </p>
+                </div>
               </div>
 
               <!-- Category -->
@@ -303,6 +273,8 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import NavigationOverlay from '@/components/NavigationOverlay.vue'
 import { useNewsStore } from '@/stores/newsStore'
+import { dataService } from '@/services/dataService'
+import { Plus } from 'lucide-vue-next'
 
 const router = useRouter()
 const newsStore = useNewsStore()
@@ -323,7 +295,6 @@ const form = ref({
 
 const errors = ref<Record<string, string>>({})
 const submitting = ref(false)
-const showModal = ref(false)
 
 // Computed
 const isFormValid = computed(() => {
@@ -361,9 +332,7 @@ const validateForm = () => {
     errors.value.category = 'Category is required'
   }
   
-  if (form.value.imageUrl && !isValidUrl(form.value.imageUrl)) {
-    errors.value.imageUrl = 'Please enter a valid URL'
-  }
+  
   
   if (form.value.sourceUrl && !isValidUrl(form.value.sourceUrl)) {
     errors.value.sourceUrl = 'Please enter a valid URL'
@@ -383,14 +352,36 @@ const isValidUrl = (url: string) => {
 
 const submitNews = async () => {
   if (!validateForm()) return
-  
-  // Show modal instead of alert
-  showModal.value = true
+  submitting.value = true
+  try {
+    let imageUrl = form.value.imageUrl
+    if (selectedFile.value) {
+      try {
+        imageUrl = await dataService.uploadImage(selectedFile.value)
+      } catch (uploadErr) {
+        console.error('Image upload failed, continue without image', uploadErr)
+      }
+    }
+    const created = await newsStore.submitNews({
+      title: form.value.title,
+      summary: form.value.summary,
+      content: form.value.content,
+      imageUrl,
+      category: form.value.category,
+      reporter: form.value.reporter,
+      sourceUrl: form.value.sourceUrl
+    })
+    if (created) {
+      resetForm()
+      router.push('/')
+    }
+  } catch (e) {
+    console.error('Failed to submit news', e)
+  } finally {
+    submitting.value = false
+  }
 }
 
-const closeModal = () => {
-  showModal.value = false
-}
 
 const resetForm = () => {
   form.value = {
@@ -406,5 +397,24 @@ const resetForm = () => {
     agreeTerms: false
   }
   errors.value = {}
+}
+
+const selectedFile = ref<File | null>(null)
+const imagePreview = ref<string | null>(null)
+const selectedFileName = computed(() => selectedFile.value ? selectedFile.value.name : 'No file selected')
+const onFileChange = (e: Event) => {
+  const files = (e.target as HTMLInputElement).files
+  if (!files || files.length === 0) {
+    selectedFile.value = null
+    imagePreview.value = null
+    return
+  }
+  selectedFile.value = files[0]
+  imagePreview.value = URL.createObjectURL(files[0])
+}
+
+const removeImage = () => {
+  selectedFile.value = null
+  imagePreview.value = null
 }
 </script>
