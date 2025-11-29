@@ -38,14 +38,16 @@
               <span class="hidden md:inline text-sm">Save</span>
             </button>
             <button 
-              @click="goToEdit"
+              v-if="userStore.isAdmin"
+              @click="openEditModal"
               class="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-2 text-blue-600 hover:text-white hover:bg-blue-600 rounded-lg transition-all duration-200"
             >
               <Pencil class="w-4 h-4" />
               <span class="hidden md:inline text-sm">Edit</span>
             </button>
             <button 
-              @click="deleteCurrentNews"
+              v-if="userStore.isAdmin"
+              @click="openDeleteConfirm"
               class="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-2 text-red-600 hover:text-white hover:bg-red-600 rounded-lg transition-all duration-200"
             >
               <XCircle class="w-4 h-4" />
@@ -270,11 +272,11 @@
                   </div>
                   <button 
                     @click="submitComment"
-                    :disabled="!newComment.trim() || !commentVoteType || submittingComment"
+                    :disabled="userStore.userRole === 'READER' || !newComment.trim() || !commentVoteType || submittingComment"
                     class="px-4 md:px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm md:text-base w-full sm:w-auto flex items-center justify-center space-x-2"
                   >
                     <div v-if="submittingComment" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>{{ submittingComment ? 'Posting...' : 'Post Comment' }}</span>
+                    <span>{{ submittingComment ? 'Posting...' : (userStore.userRole === 'READER' ? 'Readers cannot post comments' : 'Post Comment') }}</span>
                   </button>
                 </div>
               </div>
@@ -313,6 +315,37 @@
         </div>
       </div>
     </main>
+
+    <!-- Edit News Modal -->
+    <div v-if="editModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Edit News</h3>
+        <div class="grid grid-cols-1 gap-4">
+          <input v-model="editDraft.title" type="text" placeholder="Title" class="w-full px-4 py-2 rounded border border-gray-300" />
+          <input v-model="editDraft.category" type="text" placeholder="Category" class="w-full px-4 py-2 rounded border border-gray-300" />
+          <input v-model="editDraft.imageUrl" type="text" placeholder="Image URL" class="w-full px-4 py-2 rounded border border-gray-300" />
+          <textarea v-model="editDraft.summary" rows="3" placeholder="Summary" class="w-full px-4 py-2 rounded border border-gray-300"></textarea>
+          <textarea v-model="editDraft.content" rows="6" placeholder="Content" class="w-full px-4 py-2 rounded border border-gray-300"></textarea>
+        </div>
+        <div class="flex justify-end gap-3 mt-6">
+          <button @click="cancelEdit" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">Cancel</button>
+          <button @click="confirmEdit" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div v-if="confirmDeleteOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Confirm Deletion</h3>
+        <p class="text-gray-600 mb-1">Are you sure you want to delete this news?</p>
+        <p class="text-gray-500 mb-6">This action cannot be undone.</p>
+        <div class="flex justify-end gap-3">
+          <button @click="cancelDelete" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">Cancel</button>
+          <button @click="confirmDelete" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">Confirm</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Notification Toast -->
     <transition
@@ -389,6 +422,9 @@ const notification = ref<{message: string, type: 'success' | 'error' | 'info', s
   type: 'info',
   show: false
 })
+const confirmDeleteOpen = ref(false)
+const editModalOpen = ref(false)
+const editDraft = ref<Partial<News>>({})
 
 // Computed
 const hasVoted = computed(() => userVote.value !== null)
@@ -513,9 +549,6 @@ const submitComment = async () => {
     })
     
     if (comment) {
-      // Add new comment to the beginning of the list (newest first)
-      comments.value.unshift(comment)
-      
       // Clear form
       newComment.value = ''
       commentVoteType.value = null
@@ -611,14 +644,55 @@ const goToEdit = () => {
   }
 }
 
+const openEditModal = () => {
+  if (!news.value) return
+  editDraft.value = {
+    title: news.value.title,
+    summary: news.value.summary,
+    content: news.value.content,
+    category: news.value.category,
+    imageUrl: news.value.imageUrl
+  }
+  editModalOpen.value = true
+}
+
+const confirmEdit = async () => {
+  if (!news.value) return
+  editModalOpen.value = false
+  const updated = await newsStore.updateNews(news.value.id, editDraft.value)
+  if (updated) {
+    showNotification('News updated successfully!', 'success')
+  } else {
+    showNotification('Update failed.', 'error')
+  }
+}
+
+const cancelEdit = () => {
+  editModalOpen.value = false
+}
+
 const deleteCurrentNews = async () => {
   if (!news.value) return
   const ok = await newsStore.deleteNews(news.value.id)
   if (ok) {
+    showNotification('News deleted successfully!', 'success')
     router.push('/')
   } else {
-    showNotification('Failed to delete news.', 'error')
+    showNotification('Delete failed.', 'error')
   }
+}
+
+const openDeleteConfirm = () => {
+  confirmDeleteOpen.value = true
+}
+
+const confirmDelete = async () => {
+  confirmDeleteOpen.value = false
+  await deleteCurrentNews()
+}
+
+const cancelDelete = () => {
+  confirmDeleteOpen.value = false
 }
 
 const handleImageError = (event: Event) => {

@@ -252,9 +252,12 @@ export class DataService {
   }
 
   async updateNewsToAPI(id: string, news: Partial<News>): Promise<News> {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    const token = this.token || localStorage.getItem('auth_token')
+    if (token) headers['Authorization'] = `Bearer ${token}`
     const response = await fetch(`${this.apiBaseUrl}/news/${encodeURIComponent(id)}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(news)
     })
     if (!response.ok) {
@@ -296,9 +299,11 @@ export class DataService {
 
   async deleteNews(id: string): Promise<void> {
     const headers: Record<string, string> = {}
-    if (this.token) headers['Authorization'] = `Bearer ${this.token}`
+    const token = this.token || localStorage.getItem('auth_token')
+    if (token) headers['Authorization'] = `Bearer ${token}`
     const res = await fetch(`${this.apiBaseUrl}/news/${encodeURIComponent(id)}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers
     })
     if (!res.ok && res.status !== 204) {
       throw new Error('Failed to delete news')
@@ -327,6 +332,14 @@ export class DataService {
     const data = await res.json()
     this.setToken(data.accessToken)
     return { token: data.accessToken, user: data.user }
+  }
+
+  async logout(): Promise<void> {
+    const headers: Record<string, string> = {}
+    const token = this.token || localStorage.getItem('auth_token')
+    if (token) headers['Authorization'] = `Bearer ${token}`
+    await fetch(`${this.apiBaseUrl}/auth/logout`, { method: 'POST', headers })
+    this.setToken(null)
   }
 }
 

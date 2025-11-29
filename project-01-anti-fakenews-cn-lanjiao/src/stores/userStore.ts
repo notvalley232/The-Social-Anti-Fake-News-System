@@ -165,16 +165,20 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      const { dataService } = await import('@/services/dataService')
+      await dataService.logout()
+    } catch {}
     currentUser.value = null
     isAuthenticated.value = false
     userVotes.value = []
-    
-    // Clear stored data
     localStorage.removeItem('user_preferences')
     localStorage.removeItem('user_votes')
-    
+    localStorage.removeItem('current_user')
+    localStorage.removeItem('auth_token')
     clearError()
+    return { success: true }
   }
 
   const updateProfile = async (profileData: Partial<User>) => {

@@ -41,23 +41,23 @@
 
         <!-- Action Buttons -->
         <div class="hidden md:flex items-center space-x-4">
+          <div class="flex items-center space-x-3">
+            <div v-if="currentUser?.avatar" class="w-8 h-8 rounded-full overflow-hidden">
+              <img :src="currentUser.avatar" alt="avatar" class="w-full h-full object-cover" />
+            </div>
+            <div class="text-white text-sm">
+              <div class="font-semibold">{{ currentUser?.username || currentUser?.email || 'Guest' }}</div>
+              <div class="text-white/70">{{ currentUser?.role || 'READER' }}</div>
+            </div>
+          </div>
           <button
-            @click="$router.push('/submit')"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200 shadow-lg"
+            @click="onLogout"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200 shadow-lg flex items-center space-x-2"
           >
-            Submit News
-          </button>
-          <button
-            @click="toggleTheme"
-            class="p-2 text-white hover:text-blue-200 transition-colors duration-200"
-            title="Toggle Theme"
-          >
-            <svg v-if="isDark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            </svg>
+            <span>Logout</span>
           </button>
         </div>
 
@@ -109,24 +109,26 @@
               </router-link>
             </template>
             <hr class="border-white/20">
-            <button
-              @click="$router.push('/submit'); closeMobileMenu()"
-              class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200 text-center"
-            >
-              Submit News
-            </button>
-            <button
-              @click="toggleTheme"
-              class="flex items-center justify-center space-x-2 text-white hover:text-blue-200 transition-colors duration-200 py-2"
-            >
-              <svg v-if="isDark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-              <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-              </svg>
-              <span>{{ isDark ? 'Light Mode' : 'Dark Mode' }}</span>
-            </button>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div v-if="currentUser?.avatar" class="w-8 h-8 rounded-full overflow-hidden">
+                  <img :src="currentUser.avatar" alt="avatar" class="w-full h-full object-cover" />
+                </div>
+                <div class="text-white text-sm">
+                  <div class="font-semibold">{{ currentUser?.username || currentUser?.email || 'Guest' }}</div>
+                  <div class="text-white/70">{{ currentUser?.role || 'READER' }}</div>
+                </div>
+              </div>
+              <button
+                @click="onLogout(); closeMobileMenu()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span>Logout</span>
+              </button>
+            </div>
           </div>
         </div>
       </transition>
@@ -138,18 +140,20 @@
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import type { NavigationItem } from '@/types'
+import { useUserStore } from '@/stores/userStore'
 
 const router = useRouter()
 const route = useRoute()
 
 const mobileMenuOpen = ref(false)
-const isDark = ref(false)
+const store = useUserStore()
+const currentUser = computed(() => store.currentUser)
 
 const navigationItems: NavigationItem[] = [
   { label: 'Home', path: '/' },
   { label: 'Latest News', path: '/news', isCustomAction: true },
   { label: 'Fact Check', path: '/fact-check' },
-  { label: 'About', path: '/about' }
+  { label: 'About', path: '/about' },
 ]
 
 const toggleMobileMenu = () => {
@@ -160,11 +164,11 @@ const closeMobileMenu = () => {
   mobileMenuOpen.value = false
 }
 
-const toggleTheme = () => {
-  isDark.value = !isDark.value
-  // Here you would typically update a global theme store
-  // For now, we'll just toggle the local state
-  document.documentElement.classList.toggle('dark', isDark.value)
+const onLogout = async () => {
+  const res = await store.logout()
+  if (res.success) {
+    router.push('/login')
+  }
 }
 
 const handleNavigationClick = async (item: NavigationItem) => {

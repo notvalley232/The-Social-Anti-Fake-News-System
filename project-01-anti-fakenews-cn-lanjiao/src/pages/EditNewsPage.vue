@@ -9,7 +9,7 @@
             <p class="text-lg text-text-secondary">Update the article details and save your changes.</p>
           </div>
           <div class="bg-white rounded-xl shadow-soft p-6">
-            <form @submit.prevent="submitEdit" class="space-y-6">
+            <form @submit.prevent="openConfirm" class="space-y-6">
               <div>
                 <label for="title" class="block text-sm font-medium text-text-primary mb-2">News Title *</label>
                 <input id="title" v-model="form.title" type="text" required class="input w-full" :class="{ 'border-red-300': errors.title }" />
@@ -78,6 +78,31 @@
         </div>
       </div>
     </main>
+    <div v-if="confirmOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Confirm Update</h3>
+        <p class="text-gray-600 mb-1">Are you sure you want to update this news?</p>
+        <p class="text-gray-500 mb-6">This will modify the existing record.</p>
+        <div class="flex justify-end gap-3">
+          <button @click="cancelConfirm" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">Cancel</button>
+          <button @click="submitEdit" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">Confirm</button>
+        </div>
+      </div>
+    </div>
+    <transition
+      enter-active-class="transition ease-out duration-300"
+      enter-from-class="opacity-0 transform translate-y-2"
+      enter-to-class="opacity-100 transform translate-y-0"
+      leave-active-class="transition ease-in duration-200"
+      leave-from-class="opacity-100 transform translate-y-0"
+      leave-to-class="opacity-0 transform translate-y-2"
+    >
+      <div v-if="notification.show" class="fixed top-4 right-4 z-50 max-w-xs w-full mx-4">
+        <div :class="{ 'bg-green-500': notification.type === 'success', 'bg-red-500': notification.type === 'error', 'bg-blue-500': notification.type === 'info' }" class="rounded-lg shadow-lg p-3 text-white">
+          <p class="text-sm font-medium">{{ notification.message }}</p>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -106,6 +131,8 @@ const errors = ref<Record<string, string>>({})
 const submitting = ref(false)
 const selectedFile = ref<File | null>(null)
 const imagePreview = ref<string | null>(null)
+const confirmOpen = ref(false)
+const notification = ref<{message: string, type: 'success' | 'error' | 'info', show: boolean}>({ message: '', type: 'info', show: false })
 
 const isFormValid = computed(() => {
   return form.value.title.trim() &&
@@ -135,9 +162,19 @@ const onFileChange = (e: Event) => {
 }
 
 const removeImage = () => { selectedFile.value = null; imagePreview.value = null }
+const openConfirm = () => {
+  if (!validateForm()) {
+    notification.value = { message: 'Please fill in all required fields.', type: 'error', show: true }
+    setTimeout(() => { notification.value.show = false }, 3000)
+    return
+  }
+  confirmOpen.value = true
+}
+const cancelConfirm = () => { confirmOpen.value = false }
 
 const submitEdit = async () => {
   if (!validateForm()) return
+  confirmOpen.value = false
   submitting.value = true
   try {
     const id = route.params.id as string
@@ -154,9 +191,18 @@ const submitEdit = async () => {
       reporter: form.value.reporter,
       sourceUrl: form.value.sourceUrl
     })
-    if (updated) router.push(`/news/${id}`)
+    if (updated) {
+      notification.value = { message: 'News updated successfully!', type: 'success', show: true }
+      setTimeout(() => { notification.value.show = false }, 3000)
+      router.push(`/news/${id}`)
+    } else {
+      notification.value = { message: 'Update failed.', type: 'error', show: true }
+      setTimeout(() => { notification.value.show = false }, 3000)
+    }
   } catch (e) {
     console.error('Failed to update news', e)
+    notification.value = { message: 'Update failed.', type: 'error', show: true }
+    setTimeout(() => { notification.value.show = false }, 3000)
   } finally {
     submitting.value = false
   }
