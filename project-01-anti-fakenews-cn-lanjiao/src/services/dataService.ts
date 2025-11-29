@@ -159,8 +159,17 @@ export class DataService {
 
   // Get votes for specific news
   async getVotesByNewsId(newsId: string): Promise<Vote[]> {
-    const allVotes = await this.loadVotesData()
+    const allVotes = await this.loadVotesDataFromAPI()
     return allVotes.filter(vote => vote.newsId === newsId)
+  }
+
+  async getVoteStatus(newsId: string): Promise<{ voted: boolean; voteType?: 'real' | 'fake' }> {
+    const headers: Record<string, string> = {}
+    const token = this.token || localStorage.getItem('auth_token')
+    if (token) headers['Authorization'] = `Bearer ${token}`
+    const res = await fetch(`${this.apiBaseUrl}/votes/status?newsId=${encodeURIComponent(newsId)}`, { headers })
+    if (!res.ok) throw new Error('Failed to fetch vote status')
+    return await res.json()
   }
 
   // Filter news by status
@@ -207,6 +216,9 @@ export class DataService {
     })
     
     if (!response.ok) {
+      if (response.status === 409) {
+        throw new Error('ALREADY_VOTED')
+      }
       throw new Error('Failed to submit vote')
     }
     

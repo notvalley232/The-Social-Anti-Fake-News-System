@@ -210,25 +210,27 @@
               <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
                 <button 
                   @click="vote('real')"
-                  :disabled="hasVoted"
+                  :disabled="userStore.userRole === 'READER' || hasVoted"
+                  :title="userStore.userRole === 'READER' ? 'Readers cannot vote' : (hasVoted ? 'You already voted for this news' : '')"
                   class="flex items-center justify-center space-x-2 md:space-x-3 px-4 md:px-8 py-3 md:py-4 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm md:text-base"
                   :class="userVote === 'real' 
                     ? 'bg-green-600 text-white shadow-lg' 
                     : 'bg-green-100 text-green-700 hover:bg-green-200 border-2 border-green-300'"
                 >
                   <CheckCircle class="w-4 h-4 md:w-5 md:h-5" />
-                  <span>{{ userVote === 'real' ? 'Voted Real' : 'Vote Real' }}</span>
+                  <span>{{ userStore.userRole === 'READER' ? 'Readers cannot vote' : (userVote === 'real' ? 'Voted Real' : 'Vote Real') }}</span>
                 </button>
                 <button 
                     @click="vote('fake')"
-                    :disabled="hasVoted"
+                    :disabled="userStore.userRole === 'READER' || hasVoted"
+                    :title="userStore.userRole === 'READER' ? 'Readers cannot vote' : (hasVoted ? 'You already voted for this news' : '')"
                     class="flex items-center justify-center space-x-2 md:space-x-3 px-4 md:px-8 py-3 md:py-4 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm md:text-base"
                     :class="userVote === 'fake' 
                       ? 'bg-red-600 text-white shadow-lg' 
                       : 'bg-red-100 text-red-700 hover:bg-red-200 border-2 border-red-300'"
                     >
                       <XCircle class="w-4 h-4 md:w-5 md:h-5" />
-                      <span>{{ userVote === 'fake' ? 'Voted Fake' : 'Vote Fake' }}</span>
+                      <span>{{ userStore.userRole === 'READER' ? 'Readers cannot vote' : (userVote === 'fake' ? 'Voted Fake' : 'Vote Fake') }}</span>
                     </button>
                   </div>
                 </div>
@@ -418,6 +420,7 @@ import {
 } from 'lucide-vue-next'
 import NavigationOverlay from '@/components/NavigationOverlay.vue'
 import { useNewsStore } from '@/stores/newsStore'
+import { dataService } from '@/services/dataService'
 import { useUserStore } from '@/stores/userStore'
 import type { News, Comment } from '@/types'
 
@@ -496,16 +499,12 @@ const loadNewsDetail = async () => {
       comments.value = []
     }
     
-    // Check if user has voted
     try {
-      const existingVote = userStore.getUserVoteForNews(newsId)
-      if (existingVote) {
-        userVote.value = existingVote.voteType
+      const status = await dataService.getVoteStatus(newsId)
+      if (status.voted) {
+        userVote.value = status.voteType || null
       }
-    } catch (voteErr) {
-      console.warn('Failed to load user vote:', voteErr)
-      // Don't fail the entire page if vote check fails
-    }
+    } catch {}
     
   } catch (err) {
     console.error('Error loading news details:', err)
@@ -517,17 +516,9 @@ const loadNewsDetail = async () => {
 
 const vote = async (voteType: 'real' | 'fake') => {
   if (!news.value || hasVoted.value) return
-  
-  const originalVote = userVote.value
-  const originalRealVotes = news.value.realVotes
-  const originalFakeVotes = news.value.fakeVotes
-  
-  // Optimistic update
-  userVote.value = voteType
-  if (voteType === 'real') {
-    news.value.realVotes++
-  } else {
-    news.value.fakeVotes++
+  if (userStore.userRole === 'READER') {
+    showNotification('Readers cannot vote.', 'error')
+    return
   }
   
   try {
@@ -535,18 +526,22 @@ const vote = async (voteType: 'real' | 'fake') => {
       newsId: news.value.id,
       voteType
     })
+    userVote.value = voteType
     
-    // Show success message
+    const latest = await dataService.getNewsById(news.value.id)
+    if (latest) {
+      news.value = latest
+    }
     showNotification('Vote submitted successfully!', 'success')
     
   } catch (err) {
-    // Revert optimistic update
-    userVote.value = originalVote
-    news.value.realVotes = originalRealVotes
-    news.value.fakeVotes = originalFakeVotes
     
     console.error('Failed to submit vote:', err)
-    showNotification('Failed to submit vote. Please try again.', 'error')
+    if (err instanceof Error && err.message === 'ALREADY_VOTED') {
+      showNotification('You have already voted for this news.', 'error')
+    } else {
+      showNotification('Failed to submit vote. Please try again.', 'error')
+    }
   }
 }
 
