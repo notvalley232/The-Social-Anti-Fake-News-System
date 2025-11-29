@@ -335,6 +335,19 @@ export class DataService {
     }
   }
 
+  async deleteVote(id: string): Promise<void> {
+    const headers: Record<string, string> = {}
+    const token = this.token || localStorage.getItem('auth_token')
+    if (token) headers['Authorization'] = `Bearer ${token}`
+    const res = await fetch(`${this.apiBaseUrl}/admin/votes/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers
+    })
+    if (!res.ok && res.status !== 204) {
+      throw new Error('Failed to delete vote')
+    }
+  }
+
   async fetchAllUsers(): Promise<any[]> {
     const headers: Record<string, string> = {}
     const token = this.token || localStorage.getItem('auth_token')

@@ -319,6 +319,39 @@
               </div>
             </div>
           </section>
+
+          <!-- Admin: Votes Management -->
+          <section v-if="news && userStore.isAdmin" class="mt-4 md:mt-8">
+            <div class="bg-white rounded-xl shadow-sm p-4 md:p-8">
+              <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">
+                User Votes ({{ votes.length }})
+              </h2>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Vote ID</th>
+                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">User ID</th>
+                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Type</th>
+                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Created At</th>
+                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="v in votes" :key="v.id">
+                      <td class="px-4 py-2 text-sm text-gray-700">{{ v.id }}</td>
+                      <td class="px-4 py-2 text-sm text-gray-700">{{ v.userId }}</td>
+                      <td class="px-4 py-2 text-sm" :class="v.voteType === 'real' ? 'text-green-600' : 'text-red-600'">{{ v.voteType }}</td>
+                      <td class="px-4 py-2 text-sm text-gray-600">{{ formatDate(v.createdAt) }}</td>
+                      <td class="px-4 py-2">
+                        <button @click="openDeleteVote(v.id)" class="text-red-600 hover:text-white hover:bg-red-600 border border-red-300 px-2 py-1 rounded text-xs">Delete</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     </main>
@@ -363,6 +396,19 @@
         <div class="flex justify-end gap-3">
           <button @click="cancelDeleteComment" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">Cancel</button>
           <button @click="confirmDeleteComment" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm Delete Vote Modal -->
+    <div v-if="confirmDeleteVoteOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Confirm Deletion</h3>
+        <p class="text-gray-600 mb-1">Are you sure you want to delete this vote?</p>
+        <p class="text-gray-500 mb-6">This action will update the counts.</p>
+        <div class="flex justify-end gap-3">
+          <button @click="cancelDeleteVote" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">Cancel</button>
+          <button @click="confirmDeleteVote" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">Confirm</button>
         </div>
       </div>
     </div>
@@ -434,6 +480,7 @@ const loading = ref(true)
 const error = ref<string | null>(null)
 const news = ref<News | null>(null)
 const comments = ref<Comment[]>([])
+const votes = ref<any[]>([])
 const newComment = ref('')
 const commentVoteType = ref<'real' | 'fake' | null>(null)
 const submittingComment = ref(false)
@@ -498,6 +545,11 @@ const loadNewsDetail = async () => {
       // Don't fail the entire page if comments fail to load
       comments.value = []
     }
+    // Load votes (admin only)
+    try {
+      const loadedVotes = await dataService.getVotesByNewsId(newsId)
+      votes.value = loadedVotes
+    } catch {}
     
     try {
       const status = await dataService.getVoteStatus(newsId)
@@ -710,6 +762,8 @@ const cancelDelete = () => {
 
 const confirmDeleteCommentOpen = ref(false)
 const commentToDelete = ref<string | null>(null)
+const confirmDeleteVoteOpen = ref(false)
+const voteToDelete = ref<string | null>(null)
 
 const openDeleteComment = (id: string) => {
   commentToDelete.value = id
@@ -727,6 +781,34 @@ const confirmDeleteComment = async () => {
 const cancelDeleteComment = () => {
   confirmDeleteCommentOpen.value = false
   commentToDelete.value = null
+}
+
+const openDeleteVote = (id: string) => {
+  voteToDelete.value = id
+  confirmDeleteVoteOpen.value = true
+}
+
+const confirmDeleteVote = async () => {
+  confirmDeleteVoteOpen.value = false
+  if (voteToDelete.value && news.value) {
+    try {
+      const { dataService } = await import('@/services/dataService')
+      await dataService.deleteVote(voteToDelete.value)
+      votes.value = votes.value.filter(v => v.id !== voteToDelete.value)
+      const latest = await dataService.getNewsById(news.value.id)
+      if (latest) news.value = latest
+      showNotification('Vote deleted successfully!', 'success')
+    } catch (e) {
+      showNotification('Failed to delete vote.', 'error')
+    } finally {
+      voteToDelete.value = null
+    }
+  }
+}
+
+const cancelDeleteVote = () => {
+  confirmDeleteVoteOpen.value = false
+  voteToDelete.value = null
 }
 
 const handleImageError = (event: Event) => {
