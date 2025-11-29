@@ -71,11 +71,11 @@ export class DataService {
       throw new Error('Failed to upload image')
     }
     const data = await res.json()
-    if (typeof data?.name === 'string') {
-      return data.name
-    }
-    if (Array.isArray(data) && data[0]?.name) {
-      return data[0].name
+    if (typeof data?.url === 'string') return data.url
+    if (typeof data?.name === 'string') return data.name
+    if (Array.isArray(data)) {
+      if (typeof data[0]?.url === 'string') return data[0].url
+      if (typeof data[0]?.name === 'string') return data[0].name
     }
     throw new Error('Invalid upload response')
   }

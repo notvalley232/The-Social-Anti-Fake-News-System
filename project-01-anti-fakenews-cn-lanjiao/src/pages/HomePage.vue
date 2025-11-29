@@ -49,6 +49,19 @@
  
      <!-- Main Content Section -->
     <main class="relative z-10 bg-white">
+      <section class="py-8 bg-white border-b border-gray-200" v-if="isAuthenticated && currentUser">
+        <div class="container mx-auto px-4">
+          <div class="flex items-center gap-6 bg-gray-50 rounded-xl p-6 border border-gray-200">
+            <div class="w-16 h-16 rounded-full overflow-hidden bg-gray-200">
+              <img v-if="currentUser.avatar" :src="currentUser.avatar" class="w-full h-full object-cover" />
+            </div>
+            <div>
+              <div class="text-xl font-bold text-gray-900">{{ currentUser.username || currentUser.email }}</div>
+              <div class="text-gray-600">Role: {{ currentUser.role }}</div>
+            </div>
+          </div>
+        </div>
+      </section>
       <!-- News Categories Section -->
       <section id="latest-news-section" class="py-8 bg-white border-b border-gray-200">
         <div class="container mx-auto px-4">
@@ -302,10 +315,12 @@ import NavigationOverlay from '@/components/NavigationOverlay.vue'
 import VideoBackground from '@/components/VideoBackground.vue'
 import NewsCard from '@/components/NewsCard.vue'
 import { useNewsStore } from '@/stores/newsStore'
+import { useUserStore } from '@/stores/userStore'
 import type { News } from '@/types'
 
 const router = useRouter()
 const newsStore = useNewsStore()
+const userStore = useUserStore()
 
 // Reactive data
 const newsList = ref<News[]>([])
@@ -415,6 +430,9 @@ const stats = computed(() => {
     underReview: pending
   }
 })
+
+const isAuthenticated = computed(() => userStore.isAuthenticated)
+const currentUser = computed(() => userStore.currentUser)
 
 // Methods
 const loadNews = async () => {
