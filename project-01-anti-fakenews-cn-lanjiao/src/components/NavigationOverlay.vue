@@ -37,6 +37,7 @@
               {{ item.label }}
             </router-link>
           </template>
+          <router-link v-if="currentUser?.role === 'ADMIN'" to="/admin/users" class="text-white hover:text-blue-200 transition-colors duration-200 font-medium">Users</router-link>
         </div>
 
         <!-- Action Buttons -->
@@ -118,6 +119,7 @@
               </router-link>
             </template>
             <hr class="border-white/20">
+            <router-link v-if="currentUser?.role === 'ADMIN'" to="/admin/users" @click="closeMobileMenu" class="text-white hover:text-blue-200 transition-colors duration-200 font-medium py-2">Users</router-link>
             <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3" v-if="isAuthenticated">
               <div v-if="currentUser?.avatar" class="w-8 h-8 rounded-full overflow-hidden">

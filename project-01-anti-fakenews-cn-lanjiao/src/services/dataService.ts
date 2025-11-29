@@ -310,6 +310,41 @@ export class DataService {
     }
   }
 
+  async deleteComment(id: string): Promise<void> {
+    const headers: Record<string, string> = {}
+    const token = this.token || localStorage.getItem('auth_token')
+    if (token) headers['Authorization'] = `Bearer ${token}`
+    const res = await fetch(`${this.apiBaseUrl}/admin/comments/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers
+    })
+    if (!res.ok && res.status !== 204) {
+      throw new Error('Failed to delete comment')
+    }
+  }
+
+  async fetchAllUsers(): Promise<any[]> {
+    const headers: Record<string, string> = {}
+    const token = this.token || localStorage.getItem('auth_token')
+    if (token) headers['Authorization'] = `Bearer ${token}`
+    const res = await fetch(`${this.apiBaseUrl}/admin/users`, { headers })
+    if (!res.ok) throw new Error('Failed to load users')
+    return await res.json()
+  }
+
+  async updateUserRole(userId: string, role: 'READER' | 'MEMBER' | 'ADMIN'): Promise<{ id: string; role: string }> {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    const token = this.token || localStorage.getItem('auth_token')
+    if (token) headers['Authorization'] = `Bearer ${token}`
+    const res = await fetch(`${this.apiBaseUrl}/admin/users/${encodeURIComponent(userId)}/role`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify({ role })
+    })
+    if (!res.ok) throw new Error('Failed to update user role')
+    return await res.json()
+  }
+
   async login(email: string, password: string): Promise<{ token: string; user: any }> {
     const res = await fetch(`${this.apiBaseUrl}/auth/authenticate`, {
       method: 'POST',

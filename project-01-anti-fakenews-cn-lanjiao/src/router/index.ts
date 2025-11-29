@@ -8,6 +8,7 @@ import AboutPage from '@/pages/AboutPage.vue'
 import ComingSoonPage from '@/pages/ComingSoonPage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
 import RegisterPage from '@/pages/RegisterPage.vue'
+import AdminUsersPage from '@/pages/AdminUsersPage.vue'
 
 // Define route configurations
 const routes = [
@@ -54,6 +55,15 @@ const routes = [
     meta: {
       title: 'Fact Check - Anti-Fake News System',
       description: 'Explore fact-checked articles and verification results'
+    }
+  },
+  {
+    path: '/admin/users',
+    name: 'admin-users',
+    component: AdminUsersPage,
+    meta: {
+      title: 'User Management - Anti-Fake News System',
+      description: 'Manage users and roles'
     }
   },
   {
@@ -193,6 +203,12 @@ router.beforeEach((to, from, next) => {
     if (!['MEMBER', 'ADMIN'].includes(role)) return next({ name: 'login' })
   }
   if (to.name === 'admin') {
+    const raw = localStorage.getItem('current_user')
+    const user = raw ? JSON.parse(raw) : null
+    const role = user?.role || 'user'
+    if (!user || role !== 'ADMIN') return next({ name: 'login' })
+  }
+  if (to.name === 'admin-users') {
     const raw = localStorage.getItem('current_user')
     const user = raw ? JSON.parse(raw) : null
     const role = user?.role || 'user'

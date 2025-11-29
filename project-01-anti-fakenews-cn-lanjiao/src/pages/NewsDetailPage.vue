@@ -289,15 +289,16 @@
                   class="p-4 md:p-6 bg-gray-50 rounded-lg border border-gray-200"
                 >
                   <div class="flex items-start justify-between mb-3 md:mb-4">
-                    <div class="flex items-center gap-2 md:gap-3">
-                      <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm md:text-base">
-                        {{ comment.author.charAt(0).toUpperCase() }}
-                      </div>
-                      <div>
-                        <div class="font-semibold text-gray-900 text-sm md:text-base">{{ comment.author }}</div>
-                        <div class="text-xs md:text-sm text-gray-500">{{ formatDate(comment.createdAt) }}</div>
-                      </div>
+                  <div class="flex items-center gap-2 md:gap-3">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm md:text-base">
+                      {{ comment.author.charAt(0).toUpperCase() }}
                     </div>
+                    <div>
+                      <div class="font-semibold text-gray-900 text-sm md:text-base">{{ comment.author }}</div>
+                      <div class="text-xs md:text-sm text-gray-500">{{ formatDate(comment.createdAt) }}</div>
+                    </div>
+                  </div>
+                    <div class="flex items-center gap-2">
                     <span
                       :class="comment.voteType === 'real' 
                         ? 'bg-green-100 text-green-800' 
@@ -306,6 +307,10 @@
                     >
                       {{ comment.voteType === 'real' ? 'Real News' : 'Fake News' }}
                     </span>
+                    <button v-if="userStore.isAdmin" @click="openDeleteComment(comment.id)" class="text-red-600 hover:text-white hover:bg-red-600 border border-red-300 px-2 py-1 rounded text-xs">
+                      Delete
+                    </button>
+                    </div>
                   </div>
                   <p class="text-gray-700 leading-relaxed text-sm md:text-base">{{ comment.content }}</p>
                 </div>
@@ -343,6 +348,19 @@
         <div class="flex justify-end gap-3">
           <button @click="cancelDelete" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">Cancel</button>
           <button @click="confirmDelete" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm Delete Comment Modal -->
+    <div v-if="confirmDeleteCommentOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Confirm Deletion</h3>
+        <p class="text-gray-600 mb-1">Are you sure you want to delete this comment?</p>
+        <p class="text-gray-500 mb-6">This action cannot be undone.</p>
+        <div class="flex justify-end gap-3">
+          <button @click="cancelDeleteComment" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">Cancel</button>
+          <button @click="confirmDeleteComment" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">Confirm</button>
         </div>
       </div>
     </div>
@@ -695,6 +713,27 @@ const cancelDelete = () => {
   confirmDeleteOpen.value = false
 }
 
+const confirmDeleteCommentOpen = ref(false)
+const commentToDelete = ref<string | null>(null)
+
+const openDeleteComment = (id: string) => {
+  commentToDelete.value = id
+  confirmDeleteCommentOpen.value = true
+}
+
+const confirmDeleteComment = async () => {
+  confirmDeleteCommentOpen.value = false
+  if (commentToDelete.value) {
+    await deleteComment(commentToDelete.value)
+    commentToDelete.value = null
+  }
+}
+
+const cancelDeleteComment = () => {
+  confirmDeleteCommentOpen.value = false
+  commentToDelete.value = null
+}
+
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement
   img.src = '/placeholder-news.jpg'
@@ -704,4 +743,15 @@ const handleImageError = (event: Event) => {
 onMounted(() => {
   loadNewsDetail()
 })
+
+const deleteComment = async (id: string) => {
+  try {
+    const { dataService } = await import('@/services/dataService')
+    await dataService.deleteComment(id)
+    comments.value = comments.value.filter(c => c.id !== id)
+    showNotification('Comment deleted successfully!', 'success')
+  } catch (e) {
+    showNotification('Failed to delete comment.', 'error')
+  }
+}
 </script>
