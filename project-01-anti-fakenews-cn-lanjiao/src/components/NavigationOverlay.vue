@@ -41,16 +41,16 @@
 
         <!-- Action Buttons -->
         <div class="hidden md:flex items-center space-x-4">
-          <div class="flex items-center space-x-3">
+          <div class="flex items-center space-x-3" v-if="isAuthenticated">
             <div v-if="currentUser?.avatar" class="w-8 h-8 rounded-full overflow-hidden">
               <img :src="currentUser.avatar" alt="avatar" class="w-full h-full object-cover" />
             </div>
             <div class="text-white text-sm">
-              <div class="font-semibold">{{ currentUser?.username || currentUser?.email || 'Guest' }}</div>
-              <div class="text-white/70">{{ currentUser?.role || 'READER' }}</div>
+              <div class="font-semibold">{{ currentUser?.username || currentUser?.email }}</div>
+              <div class="text-white/70">{{ currentUser?.role }}</div>
             </div>
           </div>
-          <button
+          <button v-if="isAuthenticated"
             @click="onLogout"
             class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200 shadow-lg flex items-center space-x-2"
           >
@@ -58,6 +58,15 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
             <span>Logout</span>
+          </button>
+          <button v-else
+            @click="router.push('/login')"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200 shadow-lg flex items-center space-x-2"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 3h4a2 2 0 012 2v4m0 8v4a2 2 0 01-2 2h-4M5 7V5a2 2 0 012-2h4m6 10a2 2 0 012 2v0a2 2 0 01-2 2H9a2 2 0 01-2-2v0a2 2 0 012-2h12z" />
+            </svg>
+            <span>Login</span>
           </button>
         </div>
 
@@ -110,24 +119,33 @@
             </template>
             <hr class="border-white/20">
             <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div v-if="currentUser?.avatar" class="w-8 h-8 rounded-full overflow-hidden">
-                  <img :src="currentUser.avatar" alt="avatar" class="w-full h-full object-cover" />
-                </div>
-                <div class="text-white text-sm">
-                  <div class="font-semibold">{{ currentUser?.username || currentUser?.email || 'Guest' }}</div>
-                  <div class="text-white/70">{{ currentUser?.role || 'READER' }}</div>
-                </div>
+            <div class="flex items-center space-x-3" v-if="isAuthenticated">
+              <div v-if="currentUser?.avatar" class="w-8 h-8 rounded-full overflow-hidden">
+                <img :src="currentUser.avatar" alt="avatar" class="w-full h-full object-cover" />
               </div>
-              <button
-                @click="onLogout(); closeMobileMenu()"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                <span>Logout</span>
-              </button>
+              <div class="text-white text-sm">
+                <div class="font-semibold">{{ currentUser?.username || currentUser?.email }}</div>
+                <div class="text-white/70">{{ currentUser?.role }}</div>
+              </div>
+            </div>
+            <button v-if="isAuthenticated"
+              @click="onLogout(); closeMobileMenu()"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span>Logout</span>
+            </button>
+            <button v-else
+              @click="router.push('/login'); closeMobileMenu()"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 3h4a2 2 0 012 2v4m0 8v4a2 2 0 01-2 2h-4M5 7V5a2 2 0 012-2h4m6 10a2 2 0 012 2v0a2 2 0 01-2 2H9a2 2 0 01-2-2v0a2 2 0 012-2h12z" />
+              </svg>
+              <span>Login</span>
+            </button>
             </div>
           </div>
         </div>
@@ -148,6 +166,7 @@ const route = useRoute()
 const mobileMenuOpen = ref(false)
 const store = useUserStore()
 const currentUser = computed(() => store.currentUser)
+const isAuthenticated = computed(() => store.isAuthenticated)
 
 const navigationItems: NavigationItem[] = [
   { label: 'Home', path: '/' },

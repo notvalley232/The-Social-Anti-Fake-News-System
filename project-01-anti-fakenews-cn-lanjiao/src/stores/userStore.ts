@@ -59,7 +59,7 @@ export const useUserStore = defineStore('user', () => {
   const error = ref<string | null>(null)
 
   // Getters
-  const userRole = computed(() => currentUser.value?.role || 'READER')
+  const userRole = computed(() => currentUser.value?.role || null)
   
   const isAdmin = computed(() => userRole.value === 'ADMIN')
   

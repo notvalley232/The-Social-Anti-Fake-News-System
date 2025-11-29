@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUserStore } from '@/stores/userStore'
 import HomePage from '@/pages/HomePage.vue'
 import NewsDetailPage from '@/pages/NewsDetailPage.vue'
 import SearchPage from '@/pages/SearchPage.vue'
@@ -164,6 +165,12 @@ const router = createRouter({
 
 // Global navigation guards
 router.beforeEach((to, from, next) => {
+  const store = useUserStore()
+  const isAuth = store.isAuthenticated
+  if (!isAuth && !['login', 'register'].includes(String(to.name || ''))) {
+    try { localStorage.setItem('auth_message', 'Please login or register first') } catch {}
+    return next({ name: 'login', query: { redirected: '1' } })
+  }
   // Update document title
   if (to.meta?.title) {
     document.title = to.meta.title as string
