@@ -253,58 +253,26 @@ export const useNewsStore = defineStore('news', () => {
       loading.value = true
       error.value = null
       
-      const created = await dataService.submitNews(newsData as any)
-      newsList.value.unshift(created)
+      const newNews = {
+        ...newsData,
+        id: `news_${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        status: 'pending' as const,
+        realVotes: 0,
+        fakeVotes: 0
+      } as News
+
+      await dataService.submitNews(newNews)
+      
+      // Add to local state
+      newsList.value.unshift(newNews)
       totalCount.value++
-      return created
+
+      return newNews
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to submit news'
       console.error('Error submitting news:', err)
       return null
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const updateNews = async (id: string, newsData: Partial<News>) => {
-    try {
-      loading.value = true
-      error.value = null
-      const updated = await dataService.updateNews(id, newsData)
-      // Update list
-      const idx = newsList.value.findIndex(n => n.id === id)
-      if (idx !== -1) {
-        newsList.value[idx] = { ...newsList.value[idx], ...updated }
-      }
-      // Update current news if open
-      if (currentNews.value?.id === id) {
-        currentNews.value = { ...currentNews.value, ...updated }
-      }
-      return updated
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to update news'
-      console.error('Error updating news:', err)
-      return null
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const deleteNews = async (id: string) => {
-    try {
-      loading.value = true
-      error.value = null
-      await dataService.deleteNews(id)
-      newsList.value = newsList.value.filter(n => n.id !== id)
-      totalCount.value = newsList.value.length
-      if (currentNews.value?.id === id) {
-        currentNews.value = null
-      }
-      return true
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to delete news'
-      console.error('Error deleting news:', err)
-      return false
     } finally {
       loading.value = false
     }
@@ -421,8 +389,6 @@ export const useNewsStore = defineStore('news', () => {
     searchNews,
     submitVote,
     submitNews,
-    updateNews,
-    deleteNews,
     fetchComments,
     fetchCommentsByNewsId: fetchComments,
     submitComment,

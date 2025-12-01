@@ -3,10 +3,10 @@ import { ref, computed } from 'vue'
 
 interface User {
   id: string
-  username?: string
+  username: string
   email: string
   avatar?: string
-  role: 'READER' | 'MEMBER' | 'ADMIN'
+  role: 'user' | 'moderator' | 'admin'
   joinedAt: string
   votesCount: number
   submissionsCount: number
@@ -59,11 +59,11 @@ export const useUserStore = defineStore('user', () => {
   const error = ref<string | null>(null)
 
   // Getters
-  const userRole = computed(() => currentUser.value?.role || null)
+  const userRole = computed(() => currentUser.value?.role || 'user')
   
-  const isAdmin = computed(() => userRole.value === 'ADMIN')
+  const isAdmin = computed(() => userRole.value === 'admin')
   
-  const isModerator = computed(() => ['ADMIN'].includes(userRole.value))
+  const isModerator = computed(() => ['admin', 'moderator'].includes(userRole.value))
   
   const userStats = computed(() => {
     if (!currentUser.value) return null
@@ -96,25 +96,33 @@ export const useUserStore = defineStore('user', () => {
     try {
       loading.value = true
       error.value = null
-      const { dataService } = await import('@/services/dataService')
-      const res = await dataService.login(credentials.email, credentials.password)
-      const user: User = {
-        id: res.user.id,
-        email: res.user.email,
-        avatar: res.user.avatarUrl,
-        role: res.user.role,
-        joinedAt: res.user.createdAt,
-        username: res.user.firstName,
-        votesCount: 0,
-        submissionsCount: 0,
-        reputation: 0
+
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+
+      // Mock user data
+      const mockUser: User = {
+        id: 'user_1',
+        username: 'demo_user',
+        email: credentials.email,
+        avatar: 'https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=professional%20user%20avatar%20portrait&image_size=square',
+        role: 'user',
+        joinedAt: '2024-01-01T00:00:00Z',
+        votesCount: 42,
+        submissionsCount: 5,
+        reputation: 150
       }
-      currentUser.value = user
+
+      currentUser.value = mockUser
       isAuthenticated.value = true
+
+      // Load user preferences from localStorage
       loadUserPreferences()
+      
+      // Load user votes from localStorage
       loadUserVotes()
-      localStorage.setItem('current_user', JSON.stringify(user))
-      return { success: true, user }
+
+      return { success: true, user: mockUser }
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Login failed'
       return { success: false, error: error.value }
@@ -124,39 +132,40 @@ export const useUserStore = defineStore('user', () => {
   }
 
   const register = async (userData: {
-    firstName: string
-    lastName: string
+    username: string
     email: string
     password: string
-    avatarFile: File
+    confirmPassword: string
   }) => {
     try {
       loading.value = true
       error.value = null
-      const { dataService } = await import('@/services/dataService')
-      const avatarUrl = await dataService.uploadImage(userData.avatarFile)
-      const res = await dataService.register({
-        firstName: userData.firstName,
-        lastName: userData.lastName,
+
+      // Validate passwords match
+      if (userData.password !== userData.confirmPassword) {
+        throw new Error('Passwords do not match')
+      }
+
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+
+      // Mock user creation
+      const newUser: User = {
+        id: `user_${Date.now()}`,
+        username: userData.username,
         email: userData.email,
-        password: userData.password,
-        avatarUrl
-      })
-      const user: User = {
-        id: res.user.id,
-        email: res.user.email,
-        avatar: res.user.avatarUrl,
-        role: res.user.role,
-        joinedAt: res.user.createdAt,
-        username: res.user.firstName,
+        avatar: 'https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=professional%20user%20avatar%20portrait&image_size=square',
+        role: 'user',
+        joinedAt: new Date().toISOString(),
         votesCount: 0,
         submissionsCount: 0,
         reputation: 0
       }
-      currentUser.value = user
+
+      currentUser.value = newUser
       isAuthenticated.value = true
-      localStorage.setItem('current_user', JSON.stringify(user))
-      return { success: true, user }
+
+      return { success: true, user: newUser }
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Registration failed'
       return { success: false, error: error.value }
@@ -165,20 +174,16 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  const logout = async () => {
-    try {
-      const { dataService } = await import('@/services/dataService')
-      await dataService.logout()
-    } catch {}
+  const logout = () => {
     currentUser.value = null
     isAuthenticated.value = false
     userVotes.value = []
+    
+    // Clear stored data
     localStorage.removeItem('user_preferences')
     localStorage.removeItem('user_votes')
-    localStorage.removeItem('current_user')
-    localStorage.removeItem('auth_token')
+    
     clearError()
-    return { success: true }
   }
 
   const updateProfile = async (profileData: Partial<User>) => {

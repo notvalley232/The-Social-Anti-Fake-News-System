@@ -37,22 +37,6 @@
               <Bookmark class="w-4 h-4" />
               <span class="hidden md:inline text-sm">Save</span>
             </button>
-            <button 
-              v-if="userStore.isAdmin"
-              @click="openEditModal"
-              class="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-2 text-blue-600 hover:text-white hover:bg-blue-600 rounded-lg transition-all duration-200"
-            >
-              <Pencil class="w-4 h-4" />
-              <span class="hidden md:inline text-sm">Edit</span>
-            </button>
-            <button 
-              v-if="userStore.isAdmin"
-              @click="openDeleteConfirm"
-              class="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-2 text-red-600 hover:text-white hover:bg-red-600 rounded-lg transition-all duration-200"
-            >
-              <XCircle class="w-4 h-4" />
-              <span class="hidden md:inline text-sm">Delete</span>
-            </button>
           </div>
         </div>
       </div>
@@ -210,27 +194,25 @@
               <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
                 <button 
                   @click="vote('real')"
-                  :disabled="userStore.userRole === 'READER' || hasVoted"
-                  :title="userStore.userRole === 'READER' ? 'Readers cannot vote' : (hasVoted ? 'You already voted for this news' : '')"
+                  :disabled="hasVoted"
                   class="flex items-center justify-center space-x-2 md:space-x-3 px-4 md:px-8 py-3 md:py-4 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm md:text-base"
                   :class="userVote === 'real' 
                     ? 'bg-green-600 text-white shadow-lg' 
                     : 'bg-green-100 text-green-700 hover:bg-green-200 border-2 border-green-300'"
                 >
                   <CheckCircle class="w-4 h-4 md:w-5 md:h-5" />
-                  <span>{{ userStore.userRole === 'READER' ? 'Readers cannot vote' : (userVote === 'real' ? 'Voted Real' : 'Vote Real') }}</span>
+                  <span>{{ userVote === 'real' ? 'Voted Real' : 'Vote Real' }}</span>
                 </button>
                 <button 
                     @click="vote('fake')"
-                    :disabled="userStore.userRole === 'READER' || hasVoted"
-                    :title="userStore.userRole === 'READER' ? 'Readers cannot vote' : (hasVoted ? 'You already voted for this news' : '')"
+                    :disabled="hasVoted"
                     class="flex items-center justify-center space-x-2 md:space-x-3 px-4 md:px-8 py-3 md:py-4 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm md:text-base"
                     :class="userVote === 'fake' 
                       ? 'bg-red-600 text-white shadow-lg' 
                       : 'bg-red-100 text-red-700 hover:bg-red-200 border-2 border-red-300'"
                     >
                       <XCircle class="w-4 h-4 md:w-5 md:h-5" />
-                      <span>{{ userStore.userRole === 'READER' ? 'Readers cannot vote' : (userVote === 'fake' ? 'Voted Fake' : 'Vote Fake') }}</span>
+                      <span>{{ userVote === 'fake' ? 'Voted Fake' : 'Vote Fake' }}</span>
                     </button>
                   </div>
                 </div>
@@ -274,11 +256,11 @@
                   </div>
                   <button 
                     @click="submitComment"
-                    :disabled="userStore.userRole === 'READER' || !newComment.trim() || !commentVoteType || submittingComment"
+                    :disabled="!newComment.trim() || !commentVoteType || submittingComment"
                     class="px-4 md:px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm md:text-base w-full sm:w-auto flex items-center justify-center space-x-2"
                   >
                     <div v-if="submittingComment" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>{{ submittingComment ? 'Posting...' : (userStore.userRole === 'READER' ? 'Readers cannot post comments' : 'Post Comment') }}</span>
+                    <span>{{ submittingComment ? 'Posting...' : 'Post Comment' }}</span>
                   </button>
                 </div>
               </div>
@@ -291,16 +273,15 @@
                   class="p-4 md:p-6 bg-gray-50 rounded-lg border border-gray-200"
                 >
                   <div class="flex items-start justify-between mb-3 md:mb-4">
-                  <div class="flex items-center gap-2 md:gap-3">
-                    <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm md:text-base">
-                      {{ comment.author.charAt(0).toUpperCase() }}
+                    <div class="flex items-center gap-2 md:gap-3">
+                      <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm md:text-base">
+                        {{ comment.author.charAt(0).toUpperCase() }}
+                      </div>
+                      <div>
+                        <div class="font-semibold text-gray-900 text-sm md:text-base">{{ comment.author }}</div>
+                        <div class="text-xs md:text-sm text-gray-500">{{ formatDate(comment.createdAt) }}</div>
+                      </div>
                     </div>
-                    <div>
-                      <div class="font-semibold text-gray-900 text-sm md:text-base">{{ comment.author }}</div>
-                      <div class="text-xs md:text-sm text-gray-500">{{ formatDate(comment.createdAt) }}</div>
-                    </div>
-                  </div>
-                    <div class="flex items-center gap-2">
                     <span
                       :class="comment.voteType === 'real' 
                         ? 'bg-green-100 text-green-800' 
@@ -309,109 +290,15 @@
                     >
                       {{ comment.voteType === 'real' ? 'Real News' : 'Fake News' }}
                     </span>
-                    <button v-if="userStore.isAdmin" @click="openDeleteComment(comment.id)" class="text-red-600 hover:text-white hover:bg-red-600 border border-red-300 px-2 py-1 rounded text-xs">
-                      Delete
-                    </button>
-                    </div>
                   </div>
                   <p class="text-gray-700 leading-relaxed text-sm md:text-base">{{ comment.content }}</p>
                 </div>
               </div>
             </div>
           </section>
-
-          <!-- Admin: Votes Management -->
-          <section v-if="news && userStore.isAdmin" class="mt-4 md:mt-8">
-            <div class="bg-white rounded-xl shadow-sm p-4 md:p-8">
-              <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">
-                User Votes ({{ votes.length }})
-              </h2>
-              <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
-                    <tr>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Vote ID</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">User ID</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Type</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Created At</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="v in votes" :key="v.id">
-                      <td class="px-4 py-2 text-sm text-gray-700">{{ v.id }}</td>
-                      <td class="px-4 py-2 text-sm text-gray-700">{{ v.userId }}</td>
-                      <td class="px-4 py-2 text-sm" :class="v.voteType === 'real' ? 'text-green-600' : 'text-red-600'">{{ v.voteType }}</td>
-                      <td class="px-4 py-2 text-sm text-gray-600">{{ formatDate(v.createdAt) }}</td>
-                      <td class="px-4 py-2">
-                        <button @click="openDeleteVote(v.id)" class="text-red-600 hover:text-white hover:bg-red-600 border border-red-300 px-2 py-1 rounded text-xs">Delete</button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </section>
         </div>
       </div>
     </main>
-
-    <!-- Edit News Modal -->
-    <div v-if="editModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Edit News</h3>
-        <div class="grid grid-cols-1 gap-4">
-          <input v-model="editDraft.title" type="text" placeholder="Title" class="w-full px-4 py-2 rounded border border-gray-300" />
-          <input v-model="editDraft.category" type="text" placeholder="Category" class="w-full px-4 py-2 rounded border border-gray-300" />
-          <input v-model="editDraft.imageUrl" type="text" placeholder="Image URL" class="w-full px-4 py-2 rounded border border-gray-300" />
-          <textarea v-model="editDraft.summary" rows="3" placeholder="Summary" class="w-full px-4 py-2 rounded border border-gray-300"></textarea>
-          <textarea v-model="editDraft.content" rows="6" placeholder="Content" class="w-full px-4 py-2 rounded border border-gray-300"></textarea>
-        </div>
-        <div class="flex justify-end gap-3 mt-6">
-          <button @click="cancelEdit" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">Cancel</button>
-          <button @click="confirmEdit" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">Confirm</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Confirm Delete Modal -->
-    <div v-if="confirmDeleteOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-2">Confirm Deletion</h3>
-        <p class="text-gray-600 mb-1">Are you sure you want to delete this news?</p>
-        <p class="text-gray-500 mb-6">This action cannot be undone.</p>
-        <div class="flex justify-end gap-3">
-          <button @click="cancelDelete" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">Cancel</button>
-          <button @click="confirmDelete" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">Confirm</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Confirm Delete Comment Modal -->
-    <div v-if="confirmDeleteCommentOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-2">Confirm Deletion</h3>
-        <p class="text-gray-600 mb-1">Are you sure you want to delete this comment?</p>
-        <p class="text-gray-500 mb-6">This action cannot be undone.</p>
-        <div class="flex justify-end gap-3">
-          <button @click="cancelDeleteComment" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">Cancel</button>
-          <button @click="confirmDeleteComment" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">Confirm</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Confirm Delete Vote Modal -->
-    <div v-if="confirmDeleteVoteOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-2">Confirm Deletion</h3>
-        <p class="text-gray-600 mb-1">Are you sure you want to delete this vote?</p>
-        <p class="text-gray-500 mb-6">This action will update the counts.</p>
-        <div class="flex justify-end gap-3">
-          <button @click="cancelDeleteVote" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">Cancel</button>
-          <button @click="confirmDeleteVote" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">Confirm</button>
-        </div>
-      </div>
-    </div>
 
     <!-- Notification Toast -->
     <transition
@@ -461,12 +348,10 @@ import {
   Eye, 
   ExternalLink, 
   AlertCircle, 
-  RefreshCw,
-  Pencil
+  RefreshCw 
 } from 'lucide-vue-next'
 import NavigationOverlay from '@/components/NavigationOverlay.vue'
 import { useNewsStore } from '@/stores/newsStore'
-import { dataService } from '@/services/dataService'
 import { useUserStore } from '@/stores/userStore'
 import type { News, Comment } from '@/types'
 
@@ -480,7 +365,6 @@ const loading = ref(true)
 const error = ref<string | null>(null)
 const news = ref<News | null>(null)
 const comments = ref<Comment[]>([])
-const votes = ref<any[]>([])
 const newComment = ref('')
 const commentVoteType = ref<'real' | 'fake' | null>(null)
 const submittingComment = ref(false)
@@ -490,9 +374,6 @@ const notification = ref<{message: string, type: 'success' | 'error' | 'info', s
   type: 'info',
   show: false
 })
-const confirmDeleteOpen = ref(false)
-const editModalOpen = ref(false)
-const editDraft = ref<Partial<News>>({})
 
 // Computed
 const hasVoted = computed(() => userVote.value !== null)
@@ -545,18 +426,17 @@ const loadNewsDetail = async () => {
       // Don't fail the entire page if comments fail to load
       comments.value = []
     }
-    // Load votes (admin only)
-    try {
-      const loadedVotes = await dataService.getVotesByNewsId(newsId)
-      votes.value = loadedVotes
-    } catch {}
     
+    // Check if user has voted
     try {
-      const status = await dataService.getVoteStatus(newsId)
-      if (status.voted) {
-        userVote.value = status.voteType || null
+      const existingVote = userStore.getUserVoteForNews(newsId)
+      if (existingVote) {
+        userVote.value = existingVote.voteType
       }
-    } catch {}
+    } catch (voteErr) {
+      console.warn('Failed to load user vote:', voteErr)
+      // Don't fail the entire page if vote check fails
+    }
     
   } catch (err) {
     console.error('Error loading news details:', err)
@@ -568,9 +448,17 @@ const loadNewsDetail = async () => {
 
 const vote = async (voteType: 'real' | 'fake') => {
   if (!news.value || hasVoted.value) return
-  if (userStore.userRole === 'READER') {
-    showNotification('Readers cannot vote.', 'error')
-    return
+  
+  const originalVote = userVote.value
+  const originalRealVotes = news.value.realVotes
+  const originalFakeVotes = news.value.fakeVotes
+  
+  // Optimistic update
+  userVote.value = voteType
+  if (voteType === 'real') {
+    news.value.realVotes++
+  } else {
+    news.value.fakeVotes++
   }
   
   try {
@@ -578,22 +466,18 @@ const vote = async (voteType: 'real' | 'fake') => {
       newsId: news.value.id,
       voteType
     })
-    userVote.value = voteType
     
-    const latest = await dataService.getNewsById(news.value.id)
-    if (latest) {
-      news.value = latest
-    }
+    // Show success message
     showNotification('Vote submitted successfully!', 'success')
     
   } catch (err) {
+    // Revert optimistic update
+    userVote.value = originalVote
+    news.value.realVotes = originalRealVotes
+    news.value.fakeVotes = originalFakeVotes
     
     console.error('Failed to submit vote:', err)
-    if (err instanceof Error && err.message === 'ALREADY_VOTED') {
-      showNotification('You have already voted for this news.', 'error')
-    } else {
-      showNotification('Failed to submit vote. Please try again.', 'error')
-    }
+    showNotification('Failed to submit vote. Please try again.', 'error')
   }
 }
 
@@ -614,6 +498,9 @@ const submitComment = async () => {
     })
     
     if (comment) {
+      // Add new comment to the beginning of the list (newest first)
+      comments.value.unshift(comment)
+      
       // Clear form
       newComment.value = ''
       commentVoteType.value = null
@@ -702,115 +589,6 @@ const bookmarkNews = () => {
   console.log('Bookmark news')
 }
 
-const goToEdit = () => {
-  const id = route.params.id as string
-  if (id) {
-    router.push(`/news/${id}/edit`)
-  }
-}
-
-const openEditModal = () => {
-  if (!news.value) return
-  editDraft.value = {
-    title: news.value.title,
-    summary: news.value.summary,
-    content: news.value.content,
-    category: news.value.category,
-    imageUrl: news.value.imageUrl
-  }
-  editModalOpen.value = true
-}
-
-const confirmEdit = async () => {
-  if (!news.value) return
-  editModalOpen.value = false
-  const updated = await newsStore.updateNews(news.value.id, editDraft.value)
-  if (updated) {
-    showNotification('News updated successfully!', 'success')
-  } else {
-    showNotification('Update failed.', 'error')
-  }
-}
-
-const cancelEdit = () => {
-  editModalOpen.value = false
-}
-
-const deleteCurrentNews = async () => {
-  if (!news.value) return
-  const ok = await newsStore.deleteNews(news.value.id)
-  if (ok) {
-    showNotification('News deleted successfully!', 'success')
-    router.push('/')
-  } else {
-    showNotification('Delete failed.', 'error')
-  }
-}
-
-const openDeleteConfirm = () => {
-  confirmDeleteOpen.value = true
-}
-
-const confirmDelete = async () => {
-  confirmDeleteOpen.value = false
-  await deleteCurrentNews()
-}
-
-const cancelDelete = () => {
-  confirmDeleteOpen.value = false
-}
-
-const confirmDeleteCommentOpen = ref(false)
-const commentToDelete = ref<string | null>(null)
-const confirmDeleteVoteOpen = ref(false)
-const voteToDelete = ref<string | null>(null)
-
-const openDeleteComment = (id: string) => {
-  commentToDelete.value = id
-  confirmDeleteCommentOpen.value = true
-}
-
-const confirmDeleteComment = async () => {
-  confirmDeleteCommentOpen.value = false
-  if (commentToDelete.value) {
-    await deleteComment(commentToDelete.value)
-    commentToDelete.value = null
-  }
-}
-
-const cancelDeleteComment = () => {
-  confirmDeleteCommentOpen.value = false
-  commentToDelete.value = null
-}
-
-const openDeleteVote = (id: string) => {
-  voteToDelete.value = id
-  confirmDeleteVoteOpen.value = true
-}
-
-const confirmDeleteVote = async () => {
-  confirmDeleteVoteOpen.value = false
-  if (voteToDelete.value && news.value) {
-    try {
-      const { dataService } = await import('@/services/dataService')
-      await dataService.deleteVote(voteToDelete.value)
-      votes.value = votes.value.filter(v => v.id !== voteToDelete.value)
-      const latest = await dataService.getNewsById(news.value.id)
-      if (latest) news.value = latest
-      showNotification('Vote deleted successfully!', 'success')
-    } catch (e) {
-      showNotification('Failed to delete vote.', 'error')
-    } finally {
-      voteToDelete.value = null
-    }
-  }
-}
-
-const cancelDeleteVote = () => {
-  confirmDeleteVoteOpen.value = false
-  voteToDelete.value = null
-}
-
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement
   img.src = '/placeholder-news.jpg'
@@ -820,15 +598,4 @@ const handleImageError = (event: Event) => {
 onMounted(() => {
   loadNewsDetail()
 })
-
-const deleteComment = async (id: string) => {
-  try {
-    const { dataService } = await import('@/services/dataService')
-    await dataService.deleteComment(id)
-    comments.value = comments.value.filter(c => c.id !== id)
-    showNotification('Comment deleted successfully!', 'success')
-  } catch (e) {
-    showNotification('Failed to delete comment.', 'error')
-  }
-}
 </script>

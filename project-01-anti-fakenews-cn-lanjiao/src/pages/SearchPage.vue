@@ -154,7 +154,22 @@
               </div>
             </div>
 
-            
+            <div v-if="recentSearches.length > 0" class="bg-white rounded-xl shadow-soft p-6">
+              <h3 class="text-lg font-semibold text-text-primary mb-4">Recent Searches</h3>
+              <div class="space-y-2">
+                <button
+                  v-for="search in recentSearches"
+                  :key="search"
+                  @click="searchQuery = search; performSearch()"
+                  class="block w-full text-left p-2 hover:bg-background-secondary rounded-lg transition-colors"
+                >
+                  <div class="flex items-center gap-2">
+                    <Clock class="w-4 h-4 text-text-muted" />
+                    <span class="text-text-primary">{{ search }}</span>
+                  </div>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -165,7 +180,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Search } from 'lucide-vue-next'
+import { Search, Clock } from 'lucide-vue-next'
 import NavigationOverlay from '@/components/NavigationOverlay.vue'
 import NewsCard from '@/components/NewsCard.vue'
 import { useSearchStore } from '@/stores/searchStore'
@@ -193,7 +208,7 @@ const {
   hasMoreResults,
   searchSummary,
   popularSearches,
-  
+  recentSearches
 } = searchStore
 
 // Methods
@@ -246,14 +261,6 @@ onMounted(() => {
     if (route.query.status) filters.value.status = route.query.status as string
     if (route.query.sortBy) filters.value.sortBy = route.query.sortBy as string
     
-    performSearch()
-  }
-})
-
-// React to URL query changes (e.g., when navigating or updating q)
-watch(() => route.query.q, (newQ) => {
-  if (typeof newQ === 'string') {
-    searchQuery.value = newQ
     performSearch()
   }
 })

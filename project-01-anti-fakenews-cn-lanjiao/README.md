@@ -10,11 +10,11 @@
 
 ## Explanation video
 
- **Video URL:** https://youtu.be/yn6YJl5cpCo
+ **Video URL:** In preparation.......
 
 ## Live Demo
 
- **Deployed Application:** [Home - Anti-Fake News System](https://the-social-anti-fake-news-system-aj.vercel.app/)
+ **Deployed Application:** https://the-social-anti-fake-news-system-chi.vercel.app/
 
 ## Project Overview
 

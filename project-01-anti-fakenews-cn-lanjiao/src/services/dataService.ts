@@ -1,11 +1,15 @@
 // Data service for handling JSON data and future API integration
 import type { News, Comment, Vote } from '@/types'
 
+// Import JSON data (fallback for local development)
+import newsData from '@/data/mockNews.json'
+import commentsData from '@/data/mockComments.json'
+import votesData from '@/data/mockVotes.json'
+
 export class DataService {
   private static instance: DataService
-  private apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081'
-  private useExternalAPI: boolean = true
-  private token: string | null = null
+  private apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+  private useExternalAPI: boolean = import.meta.env.VITE_USE_EXTERNAL_API === 'true' || false
 
   private constructor() {}
 
@@ -33,20 +37,42 @@ export class DataService {
     return this.useExternalAPI
   }
 
-  setToken(token: string | null): void {
-    this.token = token
-    if (token) localStorage.setItem('auth_token', token)
-    else localStorage.removeItem('auth_token')
+  // Local JSON data loading methods (fallback)
+  private async loadNewsDataFromJSON(): Promise<News[]> {
+    try {
+      // Simulate API delay for realistic behavior
+      await new Promise(resolve => setTimeout(resolve, 300))
+      return newsData.news as News[]
+    } catch (error) {
+      console.error('Error loading news data from JSON:', error)
+      throw new Error('Failed to load news data from JSON')
+    }
   }
 
-  // Local JSON loading removed
+  private async loadCommentsDataFromJSON(): Promise<Comment[]> {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 200))
+      return commentsData.comments as Comment[]
+    } catch (error) {
+      console.error('Error loading comments data from JSON:', error)
+      throw new Error('Failed to load comments data from JSON')
+    }
+  }
+
+  private async loadVotesDataFromJSON(): Promise<Vote[]> {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 100))
+      return votesData.votes as Vote[]
+    } catch (error) {
+      console.error('Error loading votes data from JSON:', error)
+      throw new Error('Failed to load votes data from JSON')
+    }
+  }
 
   // API data loading methods
   private async fetchFromAPI(endpoint: string): Promise<any> {
     try {
-      const headers: Record<string, string> = {}
-      if (this.token) headers['Authorization'] = `Bearer ${this.token}`
-      const response = await fetch(`${this.apiBaseUrl}${endpoint}`, { headers })
+      const response = await fetch(`${this.apiBaseUrl}${endpoint}`)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -57,37 +83,9 @@ export class DataService {
     }
   }
 
-  async uploadImage(file: File): Promise<string> {
-    const formData = new FormData()
-    formData.append('file', file)
-    const headers: Record<string, string> = {}
-    if (this.token) headers['Authorization'] = `Bearer ${this.token}`
-    const res = await fetch(`${this.apiBaseUrl}/uploadImage`, {
-      method: 'POST',
-      body: formData,
-      headers
-    })
-    if (!res.ok) {
-      throw new Error('Failed to upload image')
-    }
-    const data = await res.json()
-    if (typeof data?.url === 'string') return data.url
-    if (typeof data?.name === 'string') return data.name
-    if (Array.isArray(data)) {
-      if (typeof data[0]?.url === 'string') return data[0].url
-      if (typeof data[0]?.name === 'string') return data[0].name
-    }
-    throw new Error('Invalid upload response')
-  }
-
   private async loadNewsDataFromAPI(): Promise<News[]> {
     const data = await this.fetchFromAPI('/mockNews.json')
     return data.news || data // Handle both {news: [...]} and [...] formats
-  }
-
-  async searchNewsByTitle(query: string): Promise<News[]> {
-    const res = await this.fetchFromAPI(`/news/search?q=${encodeURIComponent(query)}`)
-    return Array.isArray(res) ? res : (res.news || [])
   }
 
   private async loadCommentsDataFromAPI(): Promise<Comment[]> {
@@ -105,17 +103,44 @@ export class DataService {
     return data.users || data // Handle both {users: [...]} and [...] formats
   }
 
-  // Unified data loading methods
+  // Unified data loading methods with fallback
   async loadNewsData(): Promise<News[]> {
-    return await this.loadNewsDataFromAPI()
+    if (this.useExternalAPI) {
+      try {
+        return await this.loadNewsDataFromAPI()
+      } catch (error) {
+        console.warn('Failed to load from external API, falling back to local JSON:', error)
+        return await this.loadNewsDataFromJSON()
+      }
+    } else {
+      return await this.loadNewsDataFromJSON()
+    }
   }
 
   async loadCommentsData(): Promise<Comment[]> {
-    return await this.loadCommentsDataFromAPI()
+    if (this.useExternalAPI) {
+      try {
+        return await this.loadCommentsDataFromAPI()
+      } catch (error) {
+        console.warn('Failed to load from external API, falling back to local JSON:', error)
+        return await this.loadCommentsDataFromJSON()
+      }
+    } else {
+      return await this.loadCommentsDataFromJSON()
+    }
   }
 
   async loadVotesData(): Promise<Vote[]> {
-    return await this.loadVotesDataFromAPI()
+    if (this.useExternalAPI) {
+      try {
+        return await this.loadVotesDataFromAPI()
+      } catch (error) {
+        console.warn('Failed to load from external API, falling back to local JSON:', error)
+        return await this.loadVotesDataFromJSON()
+      }
+    } else {
+      return await this.loadVotesDataFromJSON()
+    }
   }
 
   async loadUsersData(): Promise<any[]> {
@@ -159,17 +184,8 @@ export class DataService {
 
   // Get votes for specific news
   async getVotesByNewsId(newsId: string): Promise<Vote[]> {
-    const allVotes = await this.loadVotesDataFromAPI()
+    const allVotes = await this.loadVotesData()
     return allVotes.filter(vote => vote.newsId === newsId)
-  }
-
-  async getVoteStatus(newsId: string): Promise<{ voted: boolean; voteType?: 'real' | 'fake' }> {
-    const headers: Record<string, string> = {}
-    const token = this.token || localStorage.getItem('auth_token')
-    if (token) headers['Authorization'] = `Bearer ${token}`
-    const res = await fetch(`${this.apiBaseUrl}/votes/status?newsId=${encodeURIComponent(newsId)}`, { headers })
-    if (!res.ok) throw new Error('Failed to fetch vote status')
-    return await res.json()
   }
 
   // Filter news by status
@@ -207,18 +223,15 @@ export class DataService {
 
   // API submission methods
   async submitVoteToAPI(newsId: string, voteType: 'real' | 'fake'): Promise<Vote> {
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-    if (this.token) headers['Authorization'] = `Bearer ${this.token}`
     const response = await fetch(`${this.apiBaseUrl}/votes`, {
       method: 'POST',
-      headers,
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ newsId, voteType, createdAt: new Date().toISOString() })
     })
     
     if (!response.ok) {
-      if (response.status === 409) {
-        throw new Error('ALREADY_VOTED')
-      }
       throw new Error('Failed to submit vote')
     }
     
@@ -226,11 +239,11 @@ export class DataService {
   }
 
   async submitCommentToAPI(newsId: string, comment: Omit<Comment, 'id' | 'createdAt'>): Promise<Comment> {
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-    if (this.token) headers['Authorization'] = `Bearer ${this.token}`
     const response = await fetch(`${this.apiBaseUrl}/comments`, {
       method: 'POST',
-      headers,
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ ...comment, newsId, createdAt: new Date().toISOString() })
     })
     
@@ -242,11 +255,11 @@ export class DataService {
   }
 
   async submitNewsToAPI(news: Omit<News, 'id' | 'createdAt' | 'status' | 'fakeVotes' | 'realVotes'>): Promise<News> {
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-    if (this.token) headers['Authorization'] = `Bearer ${this.token}`
     const response = await fetch(`${this.apiBaseUrl}/news`, {
       method: 'POST',
-      headers,
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ 
         ...news, 
         createdAt: new Date().toISOString(),
@@ -261,22 +274,6 @@ export class DataService {
     }
     
     return response.json()
-  }
-
-  async updateNewsToAPI(id: string, news: Partial<News>): Promise<News> {
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-    const token = this.token || localStorage.getItem('auth_token')
-    if (token) headers['Authorization'] = `Bearer ${token}`
-    const response = await fetch(`${this.apiBaseUrl}/news/${encodeURIComponent(id)}`, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify(news)
-    })
-    if (!response.ok) {
-      const text = await response.text().catch(() => '')
-      throw new Error(`Failed to update news (${response.status}): ${text}`)
-    }
-    return await response.json()
   }
 
   // Wrapper methods for current implementation
@@ -294,112 +291,62 @@ export class DataService {
   }
 
   async submitVote(voteData: { newsId: string; voteType: 'real' | 'fake'; createdAt: string }): Promise<Vote> {
-    return await this.submitVoteToAPI(voteData.newsId, voteData.voteType)
+    if (this.useExternalAPI) {
+      try {
+        return await this.submitVoteToAPI(voteData.newsId, voteData.voteType)
+      } catch (error) {
+        console.warn('Failed to submit vote to API, using local simulation:', error)
+      }
+    }
+    
+    // Local simulation fallback
+    const newVote: Vote = {
+      id: Date.now().toString(),
+      newsId: voteData.newsId,
+      userId: 'current-user', // This would come from auth
+      voteType: voteData.voteType,
+      createdAt: voteData.createdAt
+    }
+    return newVote
   }
 
   async submitNews(news: Omit<News, 'id' | 'createdAt' | 'status' | 'fakeVotes' | 'realVotes'>): Promise<News> {
-    return await this.submitNewsToAPI(news)
-  }
-
-  async updateNews(id: string, news: Partial<News>): Promise<News> {
-    return await this.updateNewsToAPI(id, news)
+    if (this.useExternalAPI) {
+      try {
+        return await this.submitNewsToAPI(news)
+      } catch (error) {
+        console.warn('Failed to submit news to API, using local simulation:', error)
+      }
+    }
+    
+    // Local simulation fallback
+    const newNews: News = {
+      ...news,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      status: 'pending' as const,
+      fakeVotes: 0,
+      realVotes: 0
+    }
+    return newNews
   }
 
   async submitComment(comment: Omit<Comment, 'id' | 'createdAt'>): Promise<Comment> {
-    return await this.submitCommentToAPI(comment.newsId, comment)
-  }
-
-  async deleteNews(id: string): Promise<void> {
-    const headers: Record<string, string> = {}
-    const token = this.token || localStorage.getItem('auth_token')
-    if (token) headers['Authorization'] = `Bearer ${token}`
-    const res = await fetch(`${this.apiBaseUrl}/news/${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      headers
-    })
-    if (!res.ok && res.status !== 204) {
-      throw new Error('Failed to delete news')
+    if (this.useExternalAPI) {
+      try {
+        return await this.submitCommentToAPI(comment.newsId, comment)
+      } catch (error) {
+        console.warn('Failed to submit comment to API, using local simulation:', error)
+      }
     }
-  }
-
-  async deleteComment(id: string): Promise<void> {
-    const headers: Record<string, string> = {}
-    const token = this.token || localStorage.getItem('auth_token')
-    if (token) headers['Authorization'] = `Bearer ${token}`
-    const res = await fetch(`${this.apiBaseUrl}/admin/comments/${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      headers
-    })
-    if (!res.ok && res.status !== 204) {
-      throw new Error('Failed to delete comment')
+    
+    // Local simulation fallback
+    const newComment: Comment = {
+      ...comment,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString()
     }
-  }
-
-  async deleteVote(id: string): Promise<void> {
-    const headers: Record<string, string> = {}
-    const token = this.token || localStorage.getItem('auth_token')
-    if (token) headers['Authorization'] = `Bearer ${token}`
-    const res = await fetch(`${this.apiBaseUrl}/admin/votes/${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      headers
-    })
-    if (!res.ok && res.status !== 204) {
-      throw new Error('Failed to delete vote')
-    }
-  }
-
-  async fetchAllUsers(): Promise<any[]> {
-    const headers: Record<string, string> = {}
-    const token = this.token || localStorage.getItem('auth_token')
-    if (token) headers['Authorization'] = `Bearer ${token}`
-    const res = await fetch(`${this.apiBaseUrl}/admin/users`, { headers })
-    if (!res.ok) throw new Error('Failed to load users')
-    return await res.json()
-  }
-
-  async updateUserRole(userId: string, role: 'READER' | 'MEMBER' | 'ADMIN'): Promise<{ id: string; role: string }> {
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-    const token = this.token || localStorage.getItem('auth_token')
-    if (token) headers['Authorization'] = `Bearer ${token}`
-    const res = await fetch(`${this.apiBaseUrl}/admin/users/${encodeURIComponent(userId)}/role`, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify({ role })
-    })
-    if (!res.ok) throw new Error('Failed to update user role')
-    return await res.json()
-  }
-
-  async login(email: string, password: string): Promise<{ token: string; user: any }> {
-    const res = await fetch(`${this.apiBaseUrl}/auth/authenticate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    })
-    if (!res.ok) throw new Error('Login failed')
-    const data = await res.json()
-    this.setToken(data.accessToken)
-    return { token: data.accessToken, user: data.user }
-  }
-
-  async register(payload: { firstName: string; lastName: string; email: string; password: string; avatarUrl: string }): Promise<{ token: string; user: any }> {
-    const res = await fetch(`${this.apiBaseUrl}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
-    if (!res.ok) throw new Error('Registration failed')
-    const data = await res.json()
-    this.setToken(data.accessToken)
-    return { token: data.accessToken, user: data.user }
-  }
-
-  async logout(): Promise<void> {
-    const headers: Record<string, string> = {}
-    const token = this.token || localStorage.getItem('auth_token')
-    if (token) headers['Authorization'] = `Bearer ${token}`
-    await fetch(`${this.apiBaseUrl}/auth/logout`, { method: 'POST', headers })
-    this.setToken(null)
+    return newComment
   }
 }
 

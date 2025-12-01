@@ -1,14 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useUserStore } from '@/stores/userStore'
 import HomePage from '@/pages/HomePage.vue'
 import NewsDetailPage from '@/pages/NewsDetailPage.vue'
 import SearchPage from '@/pages/SearchPage.vue'
 import SubmitNewsPage from '@/pages/SubmitNewsPage.vue'
 import AboutPage from '@/pages/AboutPage.vue'
 import ComingSoonPage from '@/pages/ComingSoonPage.vue'
-import LoginPage from '@/pages/LoginPage.vue'
-import RegisterPage from '@/pages/RegisterPage.vue'
-import AdminUsersPage from '@/pages/AdminUsersPage.vue'
 
 // Define route configurations
 const routes = [
@@ -40,30 +36,12 @@ const routes = [
     }
   },
   {
-    path: '/news/:id/edit',
-    name: 'news-edit',
-    component: () => import('@/pages/EditNewsPage.vue'),
-    meta: {
-      title: 'Edit News - Anti-Fake News System',
-      description: 'Edit a news article'
-    }
-  },
-  {
     path: '/fact-check',
     name: 'fact-check',
     component: () => import('@/pages/SearchPage.vue'),
     meta: {
       title: 'Fact Check - Anti-Fake News System',
       description: 'Explore fact-checked articles and verification results'
-    }
-  },
-  {
-    path: '/admin/users',
-    name: 'admin-users',
-    component: AdminUsersPage,
-    meta: {
-      title: 'User Management - Anti-Fake News System',
-      description: 'Manage users and roles'
     }
   },
   {
@@ -91,24 +69,6 @@ const routes = [
     meta: {
       title: 'About - Anti-Fake News System',
       description: 'Learn about our mission to combat misinformation'
-    }
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: LoginPage,
-    meta: {
-      title: 'Login - Anti-Fake News System',
-      description: 'Sign in to participate and submit content'
-    }
-  },
-  {
-    path: '/register',
-    name: 'register',
-    component: RegisterPage,
-    meta: {
-      title: 'Register - Anti-Fake News System',
-      description: 'Create an account to join the community'
     }
   },
   {
@@ -175,12 +135,6 @@ const router = createRouter({
 
 // Global navigation guards
 router.beforeEach((to, from, next) => {
-  const store = useUserStore()
-  const isAuth = store.isAuthenticated
-  if (!isAuth && !['login', 'register'].includes(String(to.name || ''))) {
-    try { localStorage.setItem('auth_message', 'Please login or register first') } catch {}
-    return next({ name: 'login', query: { redirected: '1' } })
-  }
   // Update document title
   if (to.meta?.title) {
     document.title = to.meta.title as string
@@ -195,25 +149,6 @@ router.beforeEach((to, from, next) => {
   // Add loading state (can be used with Pinia store)
   // This will be implemented when we set up the store
   
-  if (to.name === 'submit-news') {
-    const raw = localStorage.getItem('current_user')
-    const user = raw ? JSON.parse(raw) : null
-    const role = user?.role || 'user'
-    if (!user) return next({ name: 'login' })
-    if (!['MEMBER', 'ADMIN'].includes(role)) return next({ name: 'login' })
-  }
-  if (to.name === 'admin') {
-    const raw = localStorage.getItem('current_user')
-    const user = raw ? JSON.parse(raw) : null
-    const role = user?.role || 'user'
-    if (!user || role !== 'ADMIN') return next({ name: 'login' })
-  }
-  if (to.name === 'admin-users') {
-    const raw = localStorage.getItem('current_user')
-    const user = raw ? JSON.parse(raw) : null
-    const role = user?.role || 'user'
-    if (!user || role !== 'ADMIN') return next({ name: 'login' })
-  }
   next()
 })
 
